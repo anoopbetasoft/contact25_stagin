@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>Home Overview | Dashboard UI Kit</title>
+	<meta name="description" content="Dashboard UI Kit">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<!-- Google Font -->
+	<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,600" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<!-- Favicon -->
+	<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+	<link rel="icon" type="image/png" sizes="16x16" href="{{asset('assets/images/favicon.png')}}">
+
+	<!-- Stylesheet -->
+	<link rel="stylesheet" href="{{asset('assets/css/main.min.css')}}">
+</head>
+<body class="o-page">
+
+
+@include('layouts._includes.sidebar')
+
+<main class="o-page__content">
+
+	@include('layouts._includes.header')
+	@yield('content')
+
+</main>
+
+<!-- Main javascsript -->
+<script src="{{asset('assets/js/main.min.js')}}"></script>
+
+<script>
+    window.ga=function(){ga.q.push(arguments)};ga.q=[];ga.l=+new Date;
+    ga('create','UA-88739867-2','auto');ga('send','pageview')
+</script>
+<script src="https://www.google-analytics.com/analytics.js" async defer></script>
+</body>
+</html>

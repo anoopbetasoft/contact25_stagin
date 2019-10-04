@@ -1,0 +1,313 @@
+@extends('layouts.customer')
+
+
+@section('content')
+
+    @if(session()->has('message'))
+    <div class="alert alert-success">
+        {{ session()->get('message') }}
+    </div>
+    @elseif(session()->has('error'))
+    <div class="alert alert-danger">
+        {{ session()->get('error') }}
+    </div>    
+    @endif
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="white-box">
+                <div class="">
+                    <h2 class="m-b-0 m-t-0">{{$product_details[0]['p_title']}}
+                        @if($product_details[0]['p_type'] == 1)                               
+                           <span style="font-size:14px;"  class="@if($product_details[0]['p_quality'] == 1) text-success @elseif($product_details[0]['p_quality'] == 2) text-info @elseif($product_details[0]['p_quality'] == 3) text-info @else  text-warning @endif"> (New) </span> 
+                        @endif 
+                    </h2> 
+                    @if(isset($main_heading_day))
+                    <small class="text-success db collect_buy_message"><strong>Collect</strong> from <strong><span class="text-info" style="">*{{$main_heading_day}}*</span> </strong> between <strong>{{$timeslot_heading['start_time']}} and {{$timeslot_heading['end_time']}}</strong></small>
+                    @else
+                    <small class="text-success db collect_buy_message"></small>    
+                    @endif
+                    <hr>
+                    <div class="row">
+                        <div class="col-lg-5 col-md-5 col-sm-6">
+                            <div class="white-box text-center"> 
+                                @include('users.product.product_page.product_image', ["product_details[0]['p_image']" => $product_details[0]['p_image']]) 
+                            </div>
+                        </div>
+                        <div class="col-lg-7 col-md-7 col-sm-6">
+                            <form id="add_to_cart" method="POST" action="{{url('/saveOrder')}}">
+                                @csrf
+
+                                <div class="alwayshidden" style="display: none">
+                                    <h4><b>Added By : </b>{{$product_details[0]['userDet']['email']}}</h4>
+                                    <h4><b>Contact : </b>{{$product_details[0]['userDet']['contact_code']}} - {{$product_details[0]['userDet']['contact_no']}}</h4>
+                                    <h4> product type : {{$product_details[0]['p_type']}}</h4>
+                                </div>
+                                <input type="hidden" name="selling_price" value="{{$product_details[0]['p_selling_price']}}" >
+                                <input type="hidden" name="subscribe_price" value="{{$product_details[0]['p_subs_price']}}" >
+                                <input type="hidden" name="lending_price" value="{{$product_details[0]['p_lend_price']}}" >
+                                <input type="hidden" name="lending_per_option" value="{{$product_details[0]['p_price_per_optn']}}" >
+                                <input type="hidden" name="seller_id" value="{{$product_details[0]['userDet']['id']}}" >
+                                <input type="hidden" name="product_id" value="{{$product_details[0]['id']}}" >
+                                <input type="hidden" name="product_type" value="{{$product_details[0]['p_type']}}" >
+
+                                <!-- purchased value/sub total -->
+                                @if($product_details[0]['p_type'] == 1)
+                                <input id="purchase_val" type="hidden" value="{{$product_details[0]['p_selling_price']}}" name="purchase_val">
+                                @else
+                                <input id="purchase_val" type="hidden" value="" name="purchase_val">
+                                @endif
+                                <!-- bill details -->
+                                <input type="hidden" id="clientToken" name="clientToken" value="{{$clientToken}}">
+                                <input type="hidden" id="braintree_id" name="braintree_id" value="{{$braintree_customer_id}}">
+                                <input type="hidden" id="initial_token" name="initial_token" value="{{Braintree_ClientToken::generate()}}">
+                                
+
+
+                                <div class="row p-t-20">
+                                    @if(!empty($product_details[0]['p_description']))
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label class="control-label">Description</label>
+                                            <h4>{{$product_details[0]['p_description']}}</h4>
+                                        </div>
+                                    </div>
+                                    @endif
+                                    
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <select name="quantity" @if($product_details[0]['p_type'] == 1) data-style="btn-info btn-secondary"  @elseif($product_details[0]['p_type'] == 2) data-style="btn-success btn-secondary" @else data-style="btn-purple btn-secondary" @endif class="selectpicker" id="p_quantity" onchange="quantity_change(this);">
+                                                <?php for ($i=1; $i <= $product_details[0]['p_quantity'] ; $i++) { ?>
+                                                    <option value="{{$i}}">Qty : {{$i}}</option>
+                                                <?php }?>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- purchasing options types -->
+                                    @if(!empty($product_details[0]['p_item_lend_options']) && !empty($product_details[0]['p_lend_price']))
+                                    <div class="col-md-4 lending_options" style="display: none">
+                                        <div class="form-group">
+                                            <select name="buy_product_option"  data-style="btn-warning btn-secondary" class="selectpicker" onchange="lendOption(this)">
+                                                @include('users.product.product_page.purchase_type_lend', ['product_details[0]["p_price_per_optn"]' => $product_details[0]['p_price_per_optn']])
+                                            </select>
+                                        </div>
+                                    </div>
+                                    @endif
+
+                                    @if($product_details[0]['p_type'] == 3)
+                                    <div class="col-md-4 subscription_options">
+                                        <div class="form-group">
+                                            <select name="buy_product_option" data-style="btn-purple btn-secondary" class="selectpicker" onchange="subscribeOption(this)">
+                                                @include('users.product.product_page.purchase_type_subs', ['product_details[0]["p_price_per_optn"]' => $product_details[0]['p_price_per_optn']])
+                                            </select>
+                                        </div>
+                                    </div>
+                                    @endif
+
+                                    <!-- purchasing options -->
+                                    <div class="col-md-4">
+                                        
+                                        <div class="form-group">
+                                            <select name="buy_product_option" @if($product_details[0]['p_type'] == 1) data-style="btn-info btn-secondary"  @elseif($product_details[0]['p_type'] == 2) data-style="btn-success btn-secondary" @else data-style="btn-purple btn-secondary" @endif class="selectpicker" id="purchase_type" onchange="buyOption_change(this);">
+
+                                                @include('users.product.product_page.purchase_option', [
+
+                                                'product_details[0]["p_type"]' => $product_details[0]['p_type'],
+
+                                                'product_details[0]["p_selling_price"]' => $product_details[0]['p_selling_price'], 
+
+                                                'product_details[0]["p_item_lend_options"]' =>  $product_details[0]['p_item_lend_options'], 
+
+                                                'product_details[0]["p_lend_price"]' => $product_details[0]['p_lend_price'], 
+
+                                                'product_details[0]["p_subs_price"]' => $product_details[0]['p_subs_price']
+
+                                                ])
+                                            
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- collection type -->
+                                    <div class="row row-in">
+                                        @if($open_hrs_status == 1 )
+                                        <div class="col-lg-6 col-sm-7 row-in-br collect_it_select" style="cursor:pointer;">
+                                            <div class="col-in row">
+                                                <div class="col-md-6 col-sm-6 col-xs-6"><i class="fa fa-map-marker text-success" style="color:#00c292"></i>
+                                                    <h5 class="text-muted vb">Collect it</h5>
+                                                </div>
+                                                <div class="col-md-6 col-sm-6 col-xs-6">
+                                                    <h3 class="counter text-right m-t-15" style="font-size:26px;color:#00c292">£FREE</h3>  
+                                                </div>
+                                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                                    <button class="btn btn-lg btn-success waves-effect waves-light m-t-20" type="button" style="width:100%"  data-hide_coll_type="deliver_item" data-show_coll_type = "collect_item" onclick="collection_type(this)" >
+                                                        <i class="fa fa-map-marker"></i> Collect 
+                                                    </button>
+                                                </div>
+                                            </div> 
+                                        </div>
+                                        @endif
+                                        <div class="col-lg-6 col-sm-7  b-r-none deliver_it_select" style="cursor:pointer;">
+                                            <div class="col-in row">
+                                                <div class="col-md-6 col-sm-6 col-xs-6"> <i class="fa fa-truck" style="color:#9675ce"></i>
+                                                    <h5 class="text-muted vb">Deliver it</h5>
+                                                </div>
+                                                <div class="col-md-6 col-sm-6 col-xs-6">
+                                                    <h3 class="counter text-right m-t-15 text-purple" style="font-size:26px;color:#9675ce">+ £3.59</h3>
+                                                </div>
+                                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                                    <button class="btn btn-lg btn-purple waves-effect waves-light m-t-20 delivery_it_select"  type="button" style="width:100%;background-color:#9675ce; color:white;" data-hide_coll_type="collect_item" data-show_coll_type="deliver_item" onclick="collection_type(this)">
+                                                        <i class="fa fa-truck"></i> Deliver 
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- collection info -->
+                                    <div class="col-md-12" class="collection_info" id="collect_item" @if($open_hrs_status == 1 ) style="display:block" @else style="display: none" @endif>
+                                        <div style="cursor: pointer;">
+                                            <i class="fa fa-map-marker text-success" style="font-size:56px;color:#00c292"></i>
+                                            <span class="text-success" style="font-size:28px;"> 
+                                                Collect it
+                                            </span>
+                                        </div>
+                                        <h3 class="text-success">Choose <strong>Collection</strong> Time</h3>
+                                        <!-- collection slots -->
+                                        <div class="col-md-12 collection_slots"  @if($open_hrs_status == 1 ) style="display:block" @else style="display: none" @endif>
+                                            <div class="list-group">
+                                                <?php //echo "<pre>";print_r($collect_dates); echo "</pre>"; ?>
+                                                @foreach($collect_dates as $time_count => $data)
+                                                    @include('users.product.product_page.collection_slots', 
+                                                    [
+                                                    'data["start_time"]' => $data['start_time'],
+                                                    'data["end_time"]' => $data['end_time'], 
+                                                    'time_count' =>  $time_count, 
+                                                    'data["day"]' => $data['day'], 
+                                                    'data["raw_date"]' => $data["raw_date"],
+                                                    ])
+                                                @endforeach                                            
+                                            </div>
+
+                                            <p class="lead">
+                                                <button type="button" class="btn btn-success btn-lg" onclick="showAll_slots(this);"><span class="fa fa-angle-down"></span></button>
+                                            </p>
+                                        </div>
+                                        <!-- conditions  for collection-->
+                                        
+                                        <h3>Check before Completing Order</h3>
+                                        <div class="controls">
+                                            <fieldset>
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" value="x" name="timecheck_collect"  class="custom-control-input collect_condition" id="customCheck2" aria-invalid="false">
+                                                    <label class="custom-control-label" for="customCheck2">I will collect the <b>{{$product_details[0]['p_title']}}</b> <span class="text-success final_collect_time"></span></label>
+                                                </div>
+                                            </fieldset>
+                                            <fieldset>
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" value="y" name="directioncheck_collect" class="custom-control-input collect_condition" id="customCheck3" aria-invalid="false">
+                                                    <label class="custom-control-label" for="customCheck3">I've checked the directions and know how to get there <span class="text-success">check directions</span></label>
+                                                </div>
+                                            </fieldset>
+                                            <fieldset>
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" value="y" name="returncheck_collect" class="custom-control-input collect_condition" id="customCheck4" aria-invalid="false">
+                                                    <label class="custom-control-label" for="customCheck4">30 Day Money Back Guarantee - if I'm not satisfied, I can return within 30 days</label>
+                                                </div>
+                                            </fieldset>
+                                        </div>
+                                    </div>
+                                    <!--delivery info-->
+                                    <div class="col-md-12 collection_info" id="deliver_item" style="display: none">
+                                        <div style="cursor: pointer;">
+                                            <i class="fa fa-truck text-purple" style="font-size:56px;color:#00c292"></i>
+                                            <span class="text-purple" style="font-size:28px;"> 
+                                                Deliver it
+                                            </span>
+                                        </div>
+                                        <h3 class="text-purple">Choose <strong>Delivery</strong> Time</h3>
+                                        <!-- conditions for delivery -->
+                                        <h3>Check before Completing Order</h3>
+                                        <div class="controls">
+                                            <fieldset>
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" value="y" name="returncheck_deliver" class="custom-control-input deliver_condition" id="customCheck5" aria-invalid="false">
+                                                    <label class="custom-control-label" for="customCheck5">30 Day Money Back Guarantee - if I'm not satisfied, I can return within 30 days</label>
+                                                </div>
+                                            </fieldset>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-12 payment_div"  style="display: none;">
+                                        <div id="dropin-container"></div>
+                                        <a class="btn btn-info" id="submit-button" style="color:#fff;">Pay Here</a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <script type="text/javascript">
+        var clientToken = document.querySelector("#clientToken").value;
+
+        var braintree_id = document.querySelector("#braintree_id").value;
+
+        var button = document.querySelector('#submit-button');
+        
+        var amount = document.querySelector('#purchase_val').value;
+        
+
+        if(clientToken == ""){
+            
+            braintree.dropin.create({
+                authorization: "{{ Braintree_ClientToken::generate() }}",
+                container: '#dropin-container'
+            }, function (createErr, instance) {
+                button.addEventListener('click', function () {
+                    instance.requestPaymentMethod(function (err, payload) {
+                        $.get('{{ route('payment.process') }}', {payload,amount,braintree_id}, function (response) {
+                            console.log(response);
+                            if (response.success) {
+
+                                $('.preloader').css('display','block');
+                                var braintree_customer_id = response.customer_id;
+                                
+                                $("input[name='braintree_id']").val(braintree_customer_id);
+                                $("#add_to_cart").submit();
+                            } else {
+                                $('.preloader').css('display','none');
+                                alert('Payment failed');
+                            }
+                        }, 'json');
+                    });
+                });
+            });
+        }else{
+            
+            braintree.dropin.create({
+                authorization: "{{ $clientToken }}",
+                container: '#dropin-container'
+            }, function (createErr, instance) {
+                button.addEventListener('click', function () {
+                    instance.requestPaymentMethod(function (err, payload) {
+                        $.get('{{ route('payment.process') }}', {payload,amount,braintree_id}, function (response) {
+                            console.log(response);
+                            if (response.success) {
+
+                                $('.preloader').css('display','block');
+                                //var braintree_customer_id = response.transaction['customer']['id'];
+                                //$("input[name='braintree_customer_id']").val(braintree_customer_id);
+                                $("#add_to_cart").submit();
+                            } else {
+                                $('.preloader').css('display','none');
+                                alert('Payment failed');
+                            }
+                        }, 'json');
+                    });
+                });
+            });
+        }
+    </script> -->
+@endsection

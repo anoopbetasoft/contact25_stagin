@@ -1,0 +1,401 @@
+@extends('layouts.customer')
+
+
+@section('content')
+
+	<div class="page-wrapper">
+            <div class="page-product"></div>
+            <!-- ============================================================== -->
+            <!-- Container fluid  -->
+            <!-- ============================================================== -->
+            <div class="container-fluid">
+                <div style="padding: 10px;"></div>
+
+                <div id="loaded_content"></div>
+
+                <div class="row dashboard_1">
+
+                    <div class="col-lg-3 col-md-0">
+                        <div class="card bg-cyan text-white" style="height:378px;">
+                            <div class="card-body">
+                                <div id="myCarouse2" class="carousel slide" data-ride="carousel">
+                                    <!-- Carousel items -->
+                                    <div class="carousel-inner">
+                                        <div class="carousel-item">
+                                            <h3 class="cmin-height"><span style="font-size:38px">Best Friends</span> <br><span class="font-medium">share </span> </h3>
+
+                                            <br>
+
+                                            <span class="m-l-10">
+                                                     <a href="product-add.html"><button class="btn btn-block  btn-rounded btn-warning" >Start</button></a>
+                                                    </span>
+
+                                        </div>
+                                        <div class="carousel-item active">
+                                            <h3 class="cmin-height"><span style="font-size:38px">Sell</span> <br><span class="font-medium">Friends, Neighbours</span></h3>
+                                            <br>
+
+                                            <span class="m-l-10">
+                                                     <a href="product-add.html"><button class="btn btn-block  btn-rounded btn-warning" >Start</button></a>
+                                                    </span>
+
+                                        </div>
+                                        <div class="carousel-item">
+                                            <h3 class="cmin-height"><span style="font-size:38px">Your Stuff</span><br><span class="font-medium">organised</span></h3>
+
+                                            <br>
+
+                                            <span class="m-l-10">
+                                                    <a href="product-add.html"><button class="btn btn-block  btn-rounded btn-warning" >Start</button></a>
+                                                    </span>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-3" style="display:none;">
+                        <div class="white-box" style="min-height:393px;">
+                            <h3 class="box-title" style="color:#00c292"> <!--<i class="fa fa-barcode"></i>--><i class="fa fa-tag barcode_scan"></i> Sell, Share & Store</h3>
+                            <!-- <span class="text-muted"  style="color:grey">Sell you stuff, store it with our help or share it with your friends!</span><br>-->
+
+                            <div class="steamline">
+                                <div class="sl-item">
+                                    <div class="sl-left">
+                                        <button type="button" class="btn btn-success btn-circle btn-xl"><i class="fa fa-tag barcode_scan"></i> </button>
+                                    </div>
+                                    <div class="sl-right">
+
+                                        <p>Sell to friends, neighbours, country wide - it's your choice</p>
+                                    </div>
+                                </div>
+
+                                <div class="sl-item">
+                                    <div class="sl-left">
+                                        <button type="button" class="btn btn-danger btn-circle btn-xl"><i class="icon-share"></i> </button>
+                                    </div>
+                                    <div class="sl-right">
+
+                                        <p>Choose your closest friends and let them share your things</p>
+                                    </div>
+                                </div>
+
+                                <div class="sl-item">
+                                    <div class="sl-left">
+                                        <button type="button" class="btn btn-warning btn-circle btn-xl"><i class="ti-package show_boxes"></i> </button>
+                                    </div>
+                                    <div class="sl-right">
+
+                                        <p>Lots of stuff? Organise it into numbered boxes with our help</p>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- <div class="text-right"> <span class="text-muted"  style="color:grey">Then store, sell or share!</span> -->
+                            <!--<h1 style="cursor: pointer; font-size: 180px; text-align: center; ">
+                            <i class="fa fa-barcode barcode_scan"></i> 
+                            <button type="button" class="btn btn-info btn-circle btn-xl"><i class="fa fa-tag barcode_scan"></i> </button>
+
+                            <button type="button" class="btn btn-info btn-circle btn-xl"><i class="ti-package show_boxes"></i> </button>
+
+                            <button type="button" class="btn btn-info btn-circle btn-xl"><i class="icon-share"></i> </button>
+
+                            </h1>
+                            -->
+
+                            <span id="scan_result"></span>
+
+                            <span style="padding: 5px;">&nbsp;</span>
+                            <span id="barcode_results">
+
+                        <div class="sttabs tabs-style-bar price_results" style="display: none;">
+                            <nav>
+                              <ul class="new_selected">
+                                <li><a href="#section-bar-1" class="sticon btn-rounded"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>&nbsp;New</a></li>
+
+                              </ul>
+                               <ul class="good_selected">
+
+                                <li class=""><a href="#section-bar-2" class="sticon btn-rounded"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-empty"></i>&nbsp;Good</a></li>
+
+                              </ul>
+                               <ul class="ok_selected">
+
+                                <li><a href="#section-bar-3" class="sticon btn-rounded"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-empty"></i>&nbsp;OK</a></li>
+
+                              </ul>
+                            </nav>
+                        <div class="content-wrap actual_price_results" style="text-align: center; display: none;">
+                            <section id="section-bar-1" class="">
+
+                                    <p style="font-size: 10px;">
+
+                                        <span style="font-size: 30px;  color: #00c292;  ">£</span><span id="price_new" style="font-size: 46px; color: #00c292"></span><span id="price_info" class="ti-info-alt" style="font-size: 14px; padding-bottom: 20px; color: black; cursor: pointer;"></span>
+                                    <br>
+                                    <span id="price_info_desc" style="display: none;">It's great to know how much your stuff is worth ... exactly!  <br><br>
+                                            Pop it in a box and keep adding items until you've reached <span style="font-size: 12px; font-weight: bold;color: #00c292 ">£50</span> or more. Then <span style="font-size: 12px; font-weight: bold; color: #00c292  ">FREE POST</span> it to us to sell for you on Amazon, Ebay and Contact25. We'll pack, post, deal with returns and then send money via <span style="font-size: 12px; font-weight: bold; color: #00c292  ">BACS</span>.
+                                    <br>
+                                    <br> Or, if you prefer sell it yourself on Contact25 and handle the post yourself you can do that too! Remember, you'll need to send any orders within <span style="font-size: 14px; font-weight: bold;color: #00c292">48hrs <i class="fa fa-truck"></i></span>.
+                                    </p>
+                            </section>
+
+                            <section id="section-bar-2" class="">
+                                <p style="font-size: 10px;">
+                                    <span style="font-size: 30px;  color: #00c292;  ">£</span><span id="price_good" style="font-size: 46px; color: #00c292"></span><span id="price_info_good" class="ti-info-alt" style="font-size: 14px; padding-bottom: 20px; color: black; cursor: pointer;"></span>
+                                    <br>
+                                    <span id="price_info_good_desc" style="display: none;font-size: 10px;">
+                                    It's great to know how much your stuff is worth ... exactly!  <br><br>
+                                    Pop it in a box and keep adding items until you've reached <span style="font-size: 12px; font-weight: bold;color: #00c292 ">£50</span> or more. Then <span style="font-size: 12px; font-weight: bold; color: #00c292  ">FREE POST</span> it to us to sell for you on Amazon, Ebay and Contact25. We'll pack, post, deal with returns and then send money via <span style="font-size: 12px; font-weight: bold; color: #00c292  ">BACS</span>.
+                                    <br>
+                                    <br> Or, if you prefer sell it yourself on Contact25 and handle the post yourself you can do that too! Remember, you'll need to send any orders within <span style="font-size: 14px; font-weight: bold;color: #00c292">48hrs <i class="fa fa-truck"></i></span>.
+
+                                    </span>
+                                </p>
+
+                            </section>
+                            <section id="section-bar-3" class="">
+
+                                <p style="font-size: 10px;">
+                                    <span style="font-size: 30px;  color: #00c292;  ">£</span><span id="price_ok" style="font-size: 46px; color: #00c292">2,383.45</span><span id="price_info_ok" class="ti-info-alt" style="font-size: 14px; padding-bottom: 20px; color: black; cursor: pointer;"></span>
+                                    <br>
+                                    <span id="price_info_ok_desc" style="display: none;font-size: 10px;">
+                                    It's great to know how much your stuff is worth ... exactly!  <br><br>
+                                    Pop it in a box and keep adding items until you've reached <span style="font-size: 12px; font-weight: bold;color: #00c292 ">£50</span> or more. Then <span style="font-size: 12px; font-weight: bold; color: #00c292  ">FREE POST</span> it to us to sell for you on Amazon, Ebay and Contact25. We'll pack, post, deal with returns and then send money via <span style="font-size: 12px; font-weight: bold; color: #00c292  ">BACS</span>.
+                                    <br>
+                                    <br> Or, if you prefer sell it yourself on Contact25 and handle the post yourself you can do that too! Remember, you'll need to send any orders within <span style="font-size: 14px; font-weight: bold;color: #00c292">48hrs <i class="fa fa-truck"></i></span>.
+
+                                    </span>
+
+                            </section>
+
+                        </div>
+                        <!-- /content -->
+                    </div>
+                    </span>
+
+                    <div class="sttabs tabs-style-bar buy_or_sell_it" style="display: none; cursor: pointer;">
+                        <nav>
+                            <ul>
+
+                                <li class=""><a class="sticon btn-rounded sell_it"><i class="fa fa-tag m-l-5"></i>&nbsp;Sell</a></li>
+
+                                <li class=""><a class="sticon btn-rounded buy_it"><i class="fa fa-heart m-l-5"></i>&nbsp;Buy</a></li>
+
+                            </ul>
+
+                        </nav>
+
+                    </div>
+
+                    <h3 class="box-title" style="color:#00c292; font-size: 62px; text-align: center; margin-top: 50px;  display: none;"><i class="ti-package show_boxes" style="cursor: pointer;"></i><span class="ti-info-alt room_info" style="font-size: 12px; padding-bottom: 20px; color: black; cursor: pointer; margin-left: 3px;"></span></h3>
+                    <div style="text-align: center; font-size: 10px;display: none; " id="room_info_desc">
+                        Choose the <span style="font-size: 14px; font-weight: bold;color: #00c292">room <i class="ti-home"></i></span> and storage <span style="font-size: 14px; font-weight: bold;color: #00c292">box <i class="ti-package"></i></span> where your stuff will be stored. Label your box <span style="font-size: 14px; font-weight: bold;color: #00c292">1,2,3... <i class="ti-pencil-alt2"></i></span>
+                    </div>
+
+                    <!--<div style="margin-bottom:50px;"></div>-->
+                    <div class="display_box_options">
+                        <div id="add_room" style="display: none; text-align: center;">
+
+                            <select id="add_room_select" class="form-control">
+                                <option value="0"> + Add Room</option>
+                                <option value="Attic">Attic</option>
+                                <option value="Office">Office</option>
+                                <option value="Garage">Garage</option>
+                                <option value="Shed">Shed</option>
+                                <option value="Self Storage">Self Storage</option>
+                                <option value="-1">Other ...</option>
+                            </select>
+                        </div>
+                        <input type="text" class="form-control other_room" placeholder="Room Name" style="display: none;">
+
+                        <div id="choose_room_box" style="display: none;">
+
+                        </div>
+                    </div>
+
+                    <span style="padding: 5px;">&nbsp;</span>
+
+                    <div class="sttabs tabs-style-bar sell_store_confirm" style="display: none; cursor: pointer;">
+                        <nav>
+                            <ul>
+
+                                <li class=""><a class="sticon btn-rounded section-bar-5"><i class="fa fa-tag m-l-5"></i>&nbsp;Sell</a></li>
+
+                                <li class=""><a class="sticon btn-rounded section-bar-4"><i class="fa fa-heart m-l-5"></i>&nbsp;Store</a></li>
+
+                            </ul>
+
+                        </nav>
+                        <div class="content-wrap" style="text-align: center;">
+                            <section id="section-bar-5" class="">
+                                <p style="font-size: 9px;">I own this item and if it sells will post within <span style="font-size: 14px; font-weight: bold;color: #00c292">48hrs <i class="fa fa-truck"></i></span>. I will accept no-quibble returns within 30 days of the sale (paid for by the end customer). Should the item be defective or damaged I will pay for and returns costs and refund the item in full.
+                                    <br>
+                                </p>
+                                <nav>
+                                    <ul>
+
+                                        <span id="item_condition" style="display: none;"></span>
+                                        <span id="box_location" style="display: none;"></span>
+                                        <span id="room_location" style="display: none;"></span>
+                                        <span id="barcode_number" style="display: none;"></span>
+                                        <span id="s_id" style="display: none;"></span>
+                                        <span id="s_ISBN10" style="display: none;"></span>
+                                        <span id="s_ISBN13" style="display: none;"></span>
+                                        <span id="s_weight" style="display: none;"></span>
+                                        <span id="s_height" style="display: none;"></span>
+                                        <span id="s_length" style="display: none;"></span>
+                                        <span id="s_width" style="display: none;"></span>
+                                        <span id="s_label" style="display: none;"></span>
+                                        <span id="s_price" style="display: none;"></span>
+                                        <span id="s_price_like_new" style="display: none;"></span>
+                                        <span id="s_price_good" style="display: none;"></span>
+                                        <span id="s_price_ok" style="display: none;"></span>
+
+                                        <li class="tab-current" id="final_sell_it"><a class="sticon btn-rounded" style="background: #BB0003; color: white;"><i class="fa fa-tag m-l-5"></i>&nbsp;Sell It</a></li>
+                                    </ul>
+
+                                </nav>
+                            </section>
+                            <section id="section-bar-4" class="">
+                                <p style="font-size: 14px;">Store your item. You can use this app just to store your stuff and find it again!
+                                    <br>
+                                    <br> We'll value it as you go, so if you do decide to sell, you'll know how much you can expect to get for it.
+
+                                    <nav>
+                                        <ul>
+
+                                            <li class="tab-current"><a class="sticon btn-rounded" style="background:#8E06A0; color: white;"><i class="fa fa-heart m-l-5"></i>&nbsp;Store It</a></li>
+
+                                        </ul>
+
+                                    </nav>
+                            </section>
+
+                        </div>
+                        <!-- /content -->
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- carousel-->
+            <div class="col-xlg-3 col-lg-3 col-md-6  col-sm-12 home_carousel_friends">
+                <!-- END carousel-->
+            </div>
+
+            <div class="col-lg-6 col-md-6">
+                <div class="white-box">
+                    <!-- <h3 class="box-title" style="color:#fb9678">NEW CLOSE TO YOU <span style="float:right; font-size:18px;"><i class="ti-reload" style="color:#ee0ecd"></i> <i class="ti-location-pin" style="color:#00c292"></i> <i class="ti-home" style="color:#03a9f3"></i> <a href="map.html"><i class="ti-arrow-top-right"></i></a></span></h3> -->
+
+                    <!-- <object data="https://contact25.com/_old_version_Mar_19/map" width="100%" height="100%" style="min-height:295px;">
+                        <embed src="https://contact25.com/_old_version_Mar_19/map" width="100%" height="100%" style="min-height:295px;"> </embed>
+
+                    </object> -->
+
+                </div>
+            </div>
+    </div>
+    <div id="office_depot_output"></div>
+	<div style="clear:both;"></div>
+
+    <!-- ============================================================== -->
+    <!-- Comment - table -->
+    <!-- ============================================================== -->
+    <div class="row">
+        <!-- ============================================================== -->
+        <!-- Comment widgets -->
+        <!-- ============================================================== -->
+        <div class="col-lg-6 home_friend_requests">
+
+        </div>
+        <!-- ============================================================== -->
+        <!-- Table -->
+        <!-- ============================================================== -->
+        <!-- <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div>
+                            <h5 class="card-title">Find Friends</h5>
+                            <h6 class="card-subtitle">(If no app friends listed for this user) Download the app, and we'll look for your friends for you. </h6>
+                        </div>
+
+                    </div>
+                    	<span style="float:right">
+                              <img src="{{asset('assets/images/store_app.png')}}"   alt=""/>  
+                              <img src="{{asset('assets/images/store_play.png')}}" alt=""/>                                 
+                        </span>
+                </div>
+                <div class="card-body bg-light">
+                    <div class="row">
+                        <div class="col-6">
+                            <h3>Find your friends</h3>
+                            <h5 class="font-light m-t-0">Link up, and borrow/buy each other's stuff
+
+                                    </h5></div>
+                        <div class="col-6 align-self-center display-6 text-right">
+                            <h2 class="text-success"><button type="button" class="btn btn-outline-info btn-rounded"><i class="fas fa-heart"></i> Scan</button></h2></div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover no-wrap">
+                        <thead>
+                            <tr>
+
+                                <th>NAME / STUFF</th>
+
+                                <th>INVITE / IGNORE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+
+                                <td class="txt-oflo">Geoff Smith <span class="badge badge-warning badge-pill"><i class="fas fa-user-plus"></i> 24</span> </td>
+
+                                <td><span class="text-success"><button type="button" class="btn btn-secondary btn-rounded"> <i class="far fa-heart"></i> Invite</button> / <button type="button" class="btn btn-secondary btn-rounded"> <i class="fa fa-times"></i> Ignore</button></span></td>
+                            </tr>
+                            <tr>
+
+                                <td class="txt-oflo">Delight Mukaro <span class="badge badge-info badge-pill"><i class="fas fa-user-plus"></i> 324</span></span>
+                                </td>
+
+                                <td><span class="text-info"><span class="text-success"><button type="button" class="btn btn-secondary btn-rounded"> <i class="far fa-heart"></i> Pending</button></span></span>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div class="card-body bg-light">
+                    <div class="row">
+                        <div class="col-6">
+                            <h3>Scan</h3>
+                            <h5 class="font-light m-t-0">Get your friends to scan this QR code, and they'll be able to see your stuff. If they register, you'll automatically be linked.
+
+                                    </h5></div>
+                        <div class="col-6 align-self-center display-6 text-right">
+                            <h2 class="text-success">
+                                    <img src="https://chart.googleapis.com/chart?chs=100x100&cht=qr&chl=http%3A%2F%2Fwww.google.com%2F&choe=UTF-8" title="Link to Google.com" />
+                                    </h2></div>
+                    </div>
+                </div>
+
+            </div>
+        </div> -->
+    </div>
+
+
+@endsection
+
+
+
+
+

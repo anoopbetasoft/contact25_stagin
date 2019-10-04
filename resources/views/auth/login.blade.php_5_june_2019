@@ -1,0 +1,264 @@
+@extends('layouts.guest')
+
+@section('content')
+	<div class="o-page__card">
+		
+		<!-- login form -->
+		<div id="login_form">
+			<div class="c-card u-mb-xsmall">
+				<header class="c-card__header u-pt-large">
+					<a class="c-card__icon" href="#!">
+						<img src="{{('admin-login/images/logo-icon.png')}}" alt="Dashboard UI Kit">
+					</a>
+					<h1 class="u-h3 u-text-center u-mb-zero">Welcome back! Please login.</h1>
+				</header>
+			</div>
+			<div class="c-card u-mb-xsmall">
+				<form class="c-card__body" id="loginForm">
+					@csrf
+					<div class="c-field u-mb-small">
+						<label class="c-field__label" for="input1">Log in with your e-mail address</label>
+						<input class="c-input" type="email" name="email" id="input1" placeholder="clark@dashboard.com">
+						<p id="login_email"></p>
+					</div>
+
+					<div class="c-field u-mb-small">
+						<label class="c-field__label" for="input2">Password</label>
+						<input class="c-input" type="password" name="password" id="input2"
+						       placeholder="Numbers, Letters...">
+						<p id="login_password"></p>
+					</div>
+
+					<button class="c-btn c-btn--info c-btn--fullwidth" type="submit" id="login-button">Sign in to
+						Dashboard
+					</button>
+
+
+				</form>
+			</div>
+
+			<div class="o-line">
+				<a class="u-text-mute u-text-small" onclick="show('register_form')">Don’t have an account yet? Get
+					Started</a>
+				<a class="u-text-mute u-text-small" onclick="show('forgot_form')">Forgot Password?
+				</a>
+
+				<!-- <a class="u-text-mute u-text-small" onclick="show('forget_form')"
+				   {{--onclick="show('forgot_form')"--}} href="{{ route('password.request')  }}">Forgot Password?
+				</a> -->
+			</div>
+		</div>
+
+		<!-- Register Form -->
+
+		<div id="register_form" style="display: none;">
+			<div class="c-card u-mb-xsmall">
+				<header class="c-card__header u-pt-large">
+					<a class="c-card__icon" href="#!">
+						<img src="{{('admin-login/images/logo-icon.png')}}" alt="Dashboard UI Kit">
+					</a>
+					<h1 class="u-h3 u-text-center u-mb-zero">Welcome back! Please Register.</h1>
+				</header>
+			</div>
+			<div class="c-card u-mb-xsmall">
+				<form class="c-card__body" id="registerForm">
+					@csrf
+					<div class="c-field u-mb-small">
+						<label class="c-field__label" for="input3">Name</label>
+						<input class="c-input" type="text" placeholder="Name" name="name" id="input3">
+						<p id="name"></p>
+					</div>
+
+					<div class="c-field u-mb-small">
+						<label class="c-field__label" for="input4">E-mail address</label>
+						<input class="c-input" type="email" name="email" id="input4" placeholder="clark@dashboard.com">
+						<p id="email"></p>
+					</div>
+
+					<div class="c-field u-mb-small">
+						<label class="c-field__label" for="input5">Contact No</label>
+						<input class="c-input" type="text" name="contact_no" id="phone" id="input5"
+						>
+						<p id="contact_no"></p>
+					</div>
+
+					<div class="c-field u-mb-small">
+						<label class="c-field__label" for="input6">Password</label>
+						<input class="c-input" type="password" name="password" id="input6"
+						       placeholder="Numbers, Letters...">
+						<p id="password"></p>
+					</div>
+
+					<div class="c-field u-mb-small">
+						<label class="c-field__label" for="input7">Confirm Password</label>
+						<input class="c-input" type="password" id="input7" name="password_confirmation"
+						       placeholder="Confirm Password">
+					</div>
+
+					<button class="c-btn c-btn--info c-btn--fullwidth" type="submit"
+					        id="signUp">
+						Sign Up
+					</button>
+
+
+				</form>
+			</div>
+			<div class="o-line">
+				<a class="u-text-mute u-text-small" onclick="show('login_form')">Already have an account?</a>
+			</div>
+		</div>
+
+		<!-- forgot form -->
+		<div id="forgot_form" style="display: none;">
+			<div class="c-card u-mb-xsmall">
+				<header class="c-card__header u-pt-large">
+					<a class="c-card__icon" href="#!">
+						<img src="{{('admin-login/images/logo-icon.png')}}" alt="Dashboard UI Kit">
+					</a>
+					<h1 class="u-h3 u-text-center u-mb-zero">Forgot Password.</h1>
+				</header>
+			</div>
+			<div class="c-card u-mb-xsmall">
+				
+					<div class="forgot_mail_status" role="alert" style="display:none">	
+					</div>
+				
+				<form class="c-card__body" id="forgotEmailForm">
+				<!-- <form class="c-card__body" action="{{ route('password.email') }}" method="post"> -->
+					@csrf
+					<div class="c-field u-mb-small">
+						<label class="c-field__label" for="input8">Email Address:</label>
+						<input class="c-input" type="email" name="email" id="input8" placeholder="clark@dashboard.com">
+					</div>
+
+					<button class="c-btn c-btn--info c-btn--fullwidth" id="forgot_button">Send Password Reset Instructions
+					</button>
+				</form>
+			</div>
+			<div class="o-line">
+				<a class="u-text-mute u-text-small" onclick="show('login_form')">Already have an account?</a>
+			</div>
+		</div>
+	</div>
+	</div>
+
+	</div>
+
+@endsection
+
+
+@push('scripts')
+	<script>
+
+        $("#signUp").on('click', function (e) {
+        	
+            e.preventDefault();
+            var data = new FormData($('#registerForm')[0]);
+            var dial_code = $(".selected-dial-code").text();
+            data.append('dial_code', dial_code);
+
+            $.ajax({
+                url: "{{ route('register.store') }}",
+                data: data,
+                type: "POST",
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.success == "200") {
+                        show("login_form");
+                    }
+                    $.each(data.error, function (index, value) {
+                        $("#" + index).html('<span class="error">' + value + '</span>');
+
+                    });
+                }
+            });
+        });
+
+
+        $("#login-button").on('click', function (e) {
+        	
+            e.preventDefault();
+            var data = new FormData($('#loginForm')[0]);
+            $.ajax({
+                url: "{{ route('login.store') }}",
+                data: data,
+                type: "POST",
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.success == "200") {
+                        window.location.href = "{{ route('login') }}";
+                    }
+
+                    $.each(data.error, function (index, value) {
+                        $("#login_" + index).html();
+                        $("#login_" + index).html('<span class="error">' + value + '</span>');
+
+                    });
+                }
+
+            });
+        });
+
+        $("#forgot_button").on('click', function (e) {
+        	
+            e.preventDefault();
+            var data = new FormData($('#forgotEmailForm')[0]);
+            $.ajax({
+                url: "{{ route('reset.forgot') }}",
+                data: data,
+                type: "POST",
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                	$("#forgot_form").find('.forgot_mail_status').removeClass('alert alert-success alert alert-danger').html('');
+
+                	$("#input8").val('');
+                	//$("#forgot_form").find('.forgot_mail_status').hide(4000);
+                	setTimeout( function(){$("#forgot_form").find('.forgot_mail_status').hide();} , 4000);	
+                    if (data.status == 1) {
+                    	
+                    	$("#forgot_form").find('.forgot_mail_status').addClass('alert alert-success').css('display','block').html(data.message);
+                    	
+
+
+                    }else{
+                    	$("#forgot_form").find('.forgot_mail_status').addClass('alert alert-danger').css('display','block').html(data.message);
+                    	
+
+                    }
+                }
+            });
+        });
+
+        //for country language in dropdown
+        var countryData = $.fn.intlTelInput.getCountryData();
+		$.each(countryData, function(i, country) {
+		 	country.name = allCountries[i].name;
+		});
+
+		// initialise plugin
+        $("#phone").intlTelInput({
+            initialCountry: "us",
+			localizedCountries: null,
+            separateDialCode: true,
+			//utilsScript:"https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/11.0.4/js/utils.js",
+        });
+
+        $("#phone").keyup(function (event) {
+
+            if ((event.charCode >= 48 && event.charCode <= 57) || event.charCode == 46 || event.charCode == 0 || event.charCode == 109 || event.charCode == 189) {
+                return true;
+            }
+        });
+
+        $(document).on('keyup',"input", function () {
+            if ($(this).val().length) {
+                $(this).next('p').find('span').remove();
+            }
+
+        });
+
+	</script>
+@endpush
