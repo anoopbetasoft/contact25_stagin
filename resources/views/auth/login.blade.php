@@ -7,9 +7,9 @@
                 <div class="card-body">
                     <div class="form-horizontal form-material"  id="login_form" >
                         
-                        <a href="/login"><h3 class="text-center m-b-20"><img src="{{('admin-login/images/logo-icon.png')}}" alt="Dashboard UI Kit"><br>
+                        <h3 class="text-center m-b-20"><img src="{{('admin-login/images/logo-icon.png')}}" alt="Dashboard UI Kit"><br>
                         <img src="{{('admin-login/images/logo-text.png')}}" alt="Dashboard UI Kit">
-                        </h3></a>
+                        </h3>
                             @if (\Session::has('msg'))
                             <div class="alert alert-danger">
                                 <ul>
@@ -115,7 +115,7 @@
                     <div id="register_form" style="display: none;">
                        <h3 class="text-center m-b-20"><img src="{{('admin-login/images/logo-icon.png')}}" alt="Dashboard UI Kit"><br>
 
-                        <img src="{{('admin-login/images/logo-text.png')}}" alt="Dashboard UI Kit">
+                        <img src="{{('admin-login/images/logo-text-large.png')}}" alt="Dashboard UI Kit"> 
                         </h3>
                         <div class="c-card u-mb-xsmall">
                             <form class="c-card__body" id="registerForm" autocomplete="off">

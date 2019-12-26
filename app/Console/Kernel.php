@@ -13,7 +13,10 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        Commands\clearcredit::class,
+        Commands\ReminderCron::class,
+        Commands\SubscriptionAutoPay::class,
+        Commands\currency_rate_update::class,
     ];
 
     /**
@@ -26,8 +29,17 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')
         //          ->hourly();
+        /*$schedule->command('credit:clearing')
+            ->daily();*/
+        $schedule->command('credit:clearing')
+            ->everyMinute();
+        $schedule->command('reminder:cron')
+            ->everyMinute();
+        $schedule->command('subscription:autopay')
+            ->everyMinute();
+        $schedule->command('currency:rates')
+            ->daily();
     }
-
     /**
      * Register the commands for the application.
      *

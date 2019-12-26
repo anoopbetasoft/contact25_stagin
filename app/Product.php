@@ -55,7 +55,9 @@ class Product extends Model
         'p_slug',
         'service_lead_time',
         'service_time',
-        'service_time_type'
+        'service_time_type',
+        'p_delivery_option',
+        'price',
 	];
 
 	public function currency()

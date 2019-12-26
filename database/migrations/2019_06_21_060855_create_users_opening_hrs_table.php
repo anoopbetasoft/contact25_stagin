@@ -18,8 +18,8 @@ class CreateUsersOpeningHrsTable extends Migration
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->unsignedInteger('user_day');
-            $table->time('user_start_time');
-            $table->time('user_end_time');
+            $table->string('user_start_time','250');
+            $table->string('user_end_time','250');
             $table->timestamps();
         });
     }

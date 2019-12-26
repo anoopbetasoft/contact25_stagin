@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class currencies extends Model
 {
     protected $fillable = [
-
+        'currency_id',
     	'name',
         'code',
 		'symbol',
+        'decimal_places',
+        'rates',
+        'updated_at',
 	];
 	public function product()
 	{

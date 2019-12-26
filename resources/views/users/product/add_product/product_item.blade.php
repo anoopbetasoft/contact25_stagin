@@ -11,13 +11,13 @@
         @include('users.product.add_product.product_lend_to')
     </div>
 </div>
-
+<input type="hidden" name="deliveryvalues" value="{{count($delivery)}}">
 
 <div class="col-md-6">
     <label class="control-label selling_product_price text-info"><i class="fa fa-tag"></i> Selling Price</label>
     <div class="input-group mb-3">
         <div class="input-group-prepend">
-            <button class="btn btn-info" type="button">&pound;</button>
+            <button class="btn btn-info" type="button">{{$currency_symbol[0]->symbol}}</button>
         </div>
         <input type="number" min="0"  step="any" class="form-control" placeholder="Price" name="p_sell_price">
     </div>
@@ -25,7 +25,7 @@
         <label class="control-label text-warning"> <i class="fa fa-refresh"></i> Lending Price / Time</label>
         <div class="input-group mb-3">
             <div class="input-group-prepend">
-                <button class="btn btn-warning" type="button">&pound;</button>
+                <button class="btn btn-warning" type="button">{{$currency_symbol[0]->symbol}}</button>
             </div>
             <input type="number" min="0"  step="any" class="form-control lending_price_val" placeholder="Lending Price / Time" name="p_item_lend_price">
             <div class="input-group-prepend custom_dropdown_width">

@@ -1,10 +1,74 @@
 @extends('layouts.customer')
-
-
 @section('content')
 @php
 $friends = App\friend::where('friend_id_1',Auth::user()->id)->where('status','1')->orwhere('friend_id_2',Auth::user()->id)->with(['user2','user'])->get();
 @endphp
+<style>
+    /* Always set the map height explicitly to define the size of the div
+     * element that contains the map. */
+    #map {
+        height: 100%;
+    }
+    /* Optional: Makes the sample page fill the window. */
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    #floating-panel {
+        position: absolute;
+        top: 10px;
+        left: 25%;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+    }
+    .gm-style-iw.gm-style-iw-c {
+    max-width: 320px;
+    max-height: 180px !important;
+    }
+    .gm-style-iw-d {
+    overflow: hidden !important;
+    max-width: 302px;
+    max-height: 180px !important;
+    padding: 10px;
+    margin: 1px;
+}
+
+    @media (max-width:320px)
+    {
+        #map{
+            margin-bottom:20px;
+
+        }
+
+        .gm-style-iw-d {
+    padding: 3px;
+    margin: -1px !important;
+}
+    }
+
+
+    @media (max-width:678px)
+    {
+        #map{
+            margin-bottom:20px;
+
+        }
+        .gm-style-iw-d {
+    margin: 0px;
+}
+    }
+    .gmnoprint
+    {
+        display: none;
+    }
+</style>
 <!-- internal page dashboard customer -->
 <div id="loaded_content"></div>
     <div class="row dashboard_1">
@@ -261,8 +325,13 @@ $friends = App\friend::where('friend_id_1',Auth::user()->id)->where('status','1'
                                         @php $p_slug =  "buy-".$items->p_slug; $country = Auth::user()->country; $id = $items->id; 
                                         $encoded = base64_encode($items->id);
                                         $p_img_arr = explode(',', $items->p_image);
+                                        $items->p_selling_price = number_format($items->p_selling_price,$decimal_place[0]['decimal_places']);
+                                        $items->p_selling_price = str_replace('.00','',$items->p_selling_price);
+                                          $items->p_lend_price = number_format($items->p_lend_price,$decimal_place[0]['decimal_places']);
+                                            $items->p_lend_price = str_replace('.00','',$items->p_lend_price);
                                         $count = 1;
                                         @endphp
+
                                             <div class="carousel-item flex-column  <?php if($key=='1') { echo 'active'; }?>">
                                             <h2 class="box-title text-info" style="font-size:14px;font-weight:bold;">FRIENDS' NEW STUFF<span style="float:right; font-size:18px;"><a href="<?php echo url('products/') ?>"><i class="ti-arrow-top-right"></i></a></span></h2>
                                              @if(empty($items->p_image))
@@ -275,8 +344,7 @@ $friends = App\friend::where('friend_id_1',Auth::user()->id)->where('status','1'
                                             <br>
                                             <div>
                                             <span style="float:right;">
-                                                <span class="text-success" style="font-size:16px;"><a href="<?php echo url($p_slug.'-'.$country.'/'.$encoded) ?>"><i class="fa fa-tag"></i>&nbsp; {{$items->currency->symbol}}{{$items->p_selling_price}}</a></span> &nbsp;&nbsp;<span class="text-warning" style="font-size:16px;"><a href="<?php echo url($p_slug.'-'.$country.'/'.$encoded) ?>"><i class="fa fa-refresh m-l-5"></i>&nbsp; {{$items->currency->symbol}}{{$items->p_lend_price}}/wk</a></span> &nbsp;&nbsp;
-                                            
+                                                <span class="text-success" style="font-size:16px;"><a href="<?php echo url($p_slug.'-'.$country.'/'.$encoded) ?>"><i class="fa fa-tag"></i>&nbsp; {{$items->currency->symbol}}{{$items->p_selling_price}}</a></span> &nbsp;&nbsp;<span class="text-warning" style="font-size:16px;"><a href="<?php echo url($p_slug.'-'.$country.'/'.$encoded) ?>"><i class="fa fa-refresh m-l-5"></i>&nbsp; {{$items->currency->symbol}}{{$items->p_lend_price}}/wk</a></span>
 </span>
                                             </div>
                                         </div>
@@ -286,6 +354,10 @@ $friends = App\friend::where('friend_id_1',Auth::user()->id)->where('status','1'
                                         @php $p_slug =  "buy-".$items->p_slug; $country = Auth::user()->country; $id = $items->id; 
                                         $encoded = base64_encode($items->id);
                                         $p_img_arr = explode(',', $items->p_image);
+                                        $items->p_selling_price = number_format($items->p_selling_price,$decimal_place[0]['decimal_places']);
+                                        $items->p_selling_price = str_replace('.00','',$items->p_selling_price);
+                                        $items->p_lending_price = number_format($items->p_lending_price,$decimal_place[0]['decimal_places']);
+                                        $items->p_lending_price = str_replace('.00','',$items->p_lending_price);
                                         $count = 1;
                                         @endphp
                                             <div class="carousel-item flex-column  <?php if($key=='1') { echo 'active'; }?>">
@@ -320,21 +392,25 @@ $friends = App\friend::where('friend_id_1',Auth::user()->id)->where('status','1'
 
         <div class="col-lg-6 col-md-6">
         <div class="white-box">
+            <input type="hidden" name="lat" id="lat" value="{{Auth::user()->lat}}">
+            <input type="hidden" name="lng" id="lng" value="{{Auth::user()->lng}}">
             <h3 class="box-title" style="color:#fb9678">NEW CLOSE TO YOU 
-                <span style="float:right; font-size:18px;cursor: pointer;">
+               {{-- <span style="float:right; font-size:18px;cursor: pointer;">
                     <i class="ti-reload" style="color:#ee0ecd" onclick="initMap();"></i> 
                     <i class="ti-location-pin" style="color:#00c292" onclick="locate();"></i> 
                     <i class="ti-home" style="color:#03a9f3"></i> 
                     <a href="map.html"><i class="ti-arrow-top-right"></i></a>
-                </span>
+                </span>--}}
 
             </h3>
             <!-- <object data="https://contact25.com/_old_version_Mar_19/map" width="100%" height="100%" style="min-height:295px;">
             <embed src="https://contact25.com/_old_version_Mar_19/map" width="100%" height="100%" style="min-height:295px;"> 
             </object> -->
-            <div id="map" style="position: inherit;"></div>
+
+        {{--    <div id="homemap"></div>--}}
 
         </div>
+            <div id="map" style="width: 100%;height:303px;margin-top:-18px;"></div>
         
         </div>
          @endif
@@ -369,11 +445,15 @@ $friends = App\friend::where('friend_id_1',Auth::user()->id)->where('status','1'
                                @foreach($friendrequest as $requests)
                                 <div id="request{{$requests->id}}">
                                 <div class="d-flex no-block comment-row hide_request_4">
-                                    <div class="p-2"><span class="round">
+                                    <div class="p-2">  <span class="round">
                                         @if($requests->user->avatar!='')
-                                        <img src="{{asset("uploads/avatar/$requests->user->avatar")}}" alt="user" width="50">
+                                                    @if(strpos($requests->user->avatar, "https://") !== false)
+                                                        <img src="{{$requests->user->avatar}}" alt="user" width="50">
+                                                    @else
+                                                        <img src="{{asset('uploads/avatar/'.$requests->user->avatar)}}" alt="user" width="50">
+                                                    @endif
                                         @else
-                                        <img src="{{asset('admin-login/images/logo-icon.png')}}" alt="user" width="50">
+                                            <img src="{{asset('admin-login/images/logo-icon.png')}}" alt="user" width="50">
                                         @endif
                                     </span></div>
                                     <div class="comment-text w-100">
@@ -408,7 +488,7 @@ $friends = App\friend::where('friend_id_1',Auth::user()->id)->where('status','1'
                     <div class="d-flex">
                     <div>
                     <h5 class="card-title">Find Friends</h5>
-                    <h6 class="card-subtitle">(If no app friends listed for this user) Download the app, and we'll look for your friends for you. </h6>
+                    <h6 class="card-subtitle">{{--(If no app friends listed for this user) --}}Download the app, and we'll look for your friends for you. </h6>
                     </div>
 
                     </div><span style="float:right;cursor: pointer;">
@@ -424,11 +504,11 @@ $friends = App\friend::where('friend_id_1',Auth::user()->id)->where('status','1'
 
                             </h5>
                         </div>
-                        <div class="col-6 align-self-center display-6 text-right">
+                        {{--<div class="col-6 align-self-center display-6 text-right">
                             <h2 class="text-success">
                                 <button type="button" class="btn btn-outline-info btn-rounded"><i class="fas fa-heart"></i> Scan</button>
                             </h2>
-                        </div>
+                        </div>--}}
                         <div class="col-12 align-self-center display-12 text-right">
                             <h2 class="text-success">
                                 <input type="text" name="email" id="email" class="form-control" placeholder="Find Email / Mobile">
@@ -493,36 +573,38 @@ $friends = App\friend::where('friend_id_1',Auth::user()->id)->where('status','1'
         <div class="col-lg-12">
          <div class="card">
             <div class="card-body">
-        <h3>Create Friend Group</h3>
+        <h3>Create Friends Group</h3>
          <form action="/create-group" method="post">
             @csrf
-        <label>Friend Group Name</label>
+        <label>Friends Group Name</label>
         <input type="text" name="group_name" id="group_name" class="form-control" placeholder="Group Name" required>
         <br>
         <label>Choose Friends:</label><br>
         <input type="hidden" name="group_id" value="">
-        <div class="btn-group sell_to_friends" data-toggle="buttons" onclick="friendscheckall()">
+        <div class="btn-group sell_to_friends" data-toggle="buttons" {{--onclick="friendscheckall()"--}}>
                             <label class="btn sell_to_friends" style="padding:0px;">
-        <div class="custom-control custom-checkbox mr-sm-2 " style="cursor: pointer;">
+        <div class="custom-control custom-checkbox mr-sm-2 ">
         <input type="checkbox" class="custom-control-input checkbox-danger friendinput" style="cursor: pointer;" id="friendscheckall">
         <label class="custom-control-label text-danger" for="friendscheckall" style="cursor: pointer;" >Check All</label></div>
         </label>
         </div>
         @foreach($friends as $friend)
         @if($friend->friend_id_1==Auth::user()->id)
+
         <div class="btn-group sell_to_friends" data-toggle="buttons">
                             <label class="btn sell_to_friends" style="padding:0px;">
-        <div class="custom-control custom-checkbox mr-sm-2 " style="cursor: pointer;" onclick="friendscheckall2({{$friend->user2->id}})">
-        <input type="checkbox" name="friend[]" class="custom-control-input checkbox-danger friendinput friendcheck" id="friend{{$friend->user2->id}}" value="{{$friend->user2->id}}" style="cursor: pointer;">
-        <label class="custom-control-label text-danger" for="friend{{$friend->user2->id}}" style="cursor: pointer;" >{{$friend->user2->name}}</label></div>
+        <div class="custom-control custom-checkbox mr-sm-2 " {{--onclick="friendscheckall2({{$friend['user2']['id']}})"--}}>
+        <input type="checkbox" name="friend[]" class="custom-control-input checkbox-danger friendcheck" id="friend{{$friend['user2']['id']}}" value="{{$friend['user2']['id']}}" style="cursor: pointer;">
+        <label class="custom-control-label text-danger" for="friend{{$friend['user2']['id']}}" >{{$friend['user2']['name']}}</label></div>
         </label>
         </div>
-        @else
+        @elseif($friend->friend_id_2==Auth::user()->id)
+
         <div class="btn-group sell_to_friends" data-toggle="buttons">
                             <label class="btn sell_to_friends" style="padding:0px;">
-        <div class="custom-control custom-checkbox mr-sm-2 " style="cursor: pointer;">
-        <input type="checkbox" name="friend[]" class="custom-control-input checkbox-danger friendcheck" id="friend{{$friend->user->id}}" value="{{$friend->user->id}}" style="cursor: pointer;">
-        <label class="custom-control-label text-danger" for="friend{{$friend->user->name}}" style="cursor: pointer;" >{{$friend->user->name}}</label></div>
+        <div class="custom-control custom-checkbox mr-sm-2 ">
+        <input type="checkbox" name="friend[]" class="custom-control-input checkbox-danger friendcheck" id="friend{{$friend['user']['id']}}" value="{{$friend['user']['id']}}" style="cursor: pointer;">
+        <label class="custom-control-label text-danger" for="friend{{$friend['user']['id']}}">{{$friend['user']['name']}}</label></div>
         </label>
         </div>
         @endif
@@ -564,50 +646,272 @@ $friends = App\friend::where('friend_id_1',Auth::user()->id)->where('status','1'
 
     </div>
     @endif
-    <!-- ============================================================== -->
-    <!-- End Comment - chats -->
-    <!-- ============================================================== -->
+
+  {{--<script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD08Emygz5W4HKOZXvogXKb5zYjA8ZRMaQ&callback=initMap"></script>--}}
+              <script async defer
+                      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD08Emygz5W4HKOZXvogXKb5zYjA8ZRMaQ"></script>
+              <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+              <script>
+                  $(document).ready(function() {
+                      if (localStorage.getItem("latitude") === null || localStorage.getItem("latitude") === "") {
+                          initGeolocation();
+                      }
+                      function initGeolocation() {
+                          if (navigator && navigator.geolocation) {
+                              navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+                          } else {
+                              console.log('Geolocation is not supported');
+                          }
+                      }
+
+                      function errorCallback() {
+                          localStorage.setItem("latitude","");
+                          localStorage.setItem("longitude","");
+
+                      }
+
+                      function successCallback(position) {
+                          localStorage.setItem("latitude",position.coords.latitude);
+                          localStorage.setItem("longitude",position.coords.longitude);
+
+                      }
+                  });
+              </script>
+        <script type="text/javascript">
+
+                var map;
+                var infoWindow;
+                var markersData = [];
+                var mainUrl = '';
+                var bounds = '';
+                var userid = [];
+                var lat = [];
+                var lng = [];
+                //console.log(localStorage.getItem("latitude"));
+                //console.log(localStorage.getItem("longitude"));
+                if (localStorage.getItem("latitude") === null || localStorage.getItem("latitude") === "")
+                {
+                    var lat = $('#lat').val();
+                    var lng = $('#lng').val();
+                }
+                else
+                {
+                    var lat = localStorage.getItem("latitude");
+                    var lng = localStorage.getItem("longitude");
+                }
+
+                var icons = {
+                    shop: {
+                        icon:  'assets/googlemap/orange.png'
+                    },
+                    home: {
+                        icon: 'assets/googlemap/purple.png'
+                    },
+                    hotspot: {
+                        icon: 'assets/googlemap/red.png'
+                    }
+                };
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.ajax({
+            type: 'POST',
+            url: mainUrl+'/fetchlocationproduct',
+            dataType : 'json',
+            success: function(data) {
+                if(data.error=='1')
+                {
+                  alert(data.message);
+                }
+                else
+                {
+
+                        markersData = data;
+                        initialize(lat, lng, markersData);
+                }
+
+            },
+            error: function(data) {
+                alert("Some error occured"); //location.reload(); return false;
+                //console.log();
+            }
+        });
+            function initGeolocation() {
+                if (navigator && navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+                } else {
+                    console.log('Geolocation is not supported');
+                }
+            }
+            function errorCallback() {
+                localStorage.setItem("latitude","");
+                localStorage.setItem("longitude","");
+
+            }
+
+            function successCallback(position) {
+                localStorage.setItem("latitude",position.coords.latitude);
+                localStorage.setItem("longitude",position.coords.longitude);
+
+            }
+
+            function initialize(latitude,longitude,markersData)
+        {
+            var mapOptions = {
+                center: new google.maps.LatLng(latitude,longitude),
+                zoom: 10,
+                mapTypeId: 'roadmap',
+                gestureHandling: 'greedy',
+                styles: [{"featureType":"administrative","elementType":"geometry.fill","stylers":[{"color":"#d6e2e6"}]},{"featureType":"administrative","elementType":"geometry.stroke","stylers":[{"color":"#cfd4d5"}]},{"featureType":"administrative","elementType":"labels.text.fill","stylers":[{"color":"#7492a8"}]},{"featureType":"administrative.neighborhood","elementType":"labels.text.fill","stylers":[{"lightness":25}]},{"featureType":"landscape.man_made","elementType":"geometry.fill","stylers":[{"color":"#dde2e3"}]},{"featureType":"landscape.man_made","elementType":"geometry.stroke","stylers":[{"color":"#cfd4d5"}]},{"featureType":"landscape.natural","elementType":"geometry.fill","stylers":[{"color":"#dde2e3"}]},{"featureType":"landscape.natural","elementType":"labels.text.fill","stylers":[{"color":"#7492a8"}]},{"featureType":"landscape.natural.terrain","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"poi","elementType":"geometry.fill","stylers":[{"color":"#dde2e3"}]},{"featureType":"poi","elementType":"labels.text.fill","stylers":[{"color":"#588ca4"}]},{"featureType":"poi","elementType":"labels.icon","stylers":[{"saturation":-100}]},{"featureType":"poi.park","elementType":"geometry.fill","stylers":[{"color":"#a9de83"}]},{"featureType":"poi.park","elementType":"geometry.stroke","stylers":[{"color":"#bae6a1"}]},{"featureType":"poi.sports_complex","elementType":"geometry.fill","stylers":[{"color":"#c6e8b3"}]},{"featureType":"poi.sports_complex","elementType":"geometry.stroke","stylers":[{"color":"#bae6a1"}]},{"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#41626b"}]},{"featureType":"road","elementType":"labels.icon","stylers":[{"saturation":-45},{"lightness":10},{"visibility":"on"}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#c1d1d6"}]},{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#a6b5bb"}]},{"featureType":"road.highway","elementType":"labels.icon","stylers":[{"visibility":"on"}]},{"featureType":"road.highway.controlled_access","elementType":"geometry.fill","stylers":[{"color":"#9fb6bd"}]},{"featureType":"road.arterial","elementType":"geometry.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"road.local","elementType":"geometry.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"transit","elementType":"labels.icon","stylers":[{"saturation":-70}]},{"featureType":"transit.line","elementType":"geometry.fill","stylers":[{"color":"#b4cbd4"}]},{"featureType":"transit.line","elementType":"labels.text.fill","stylers":[{"color":"#588ca4"}]},{"featureType":"transit.station","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"transit.station","elementType":"labels.text.fill","stylers":[{"color":"#008cb5"},{"visibility":"on"}]},{"featureType":"transit.station.airport","elementType":"geometry.fill","stylers":[{"saturation":-100},{"lightness":-5}]},{"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#a6cbe3"}]}]
+            };
+
+            map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+            // a new Info Window is created
+            infoWindow = new google.maps.InfoWindow();
+
+            // Event that closes the Info Window with a click on the map
+            google.maps.event.addListener(map, 'click', function() {
+                infoWindow.close();
+            });
+
+            // Finally displayMarkers() function is called to begin the markers creation
+            displayMarkers(latitude,longitude,markersData);
+            setTimeout(function(){
+               // map.setCenter(new google.maps.LatLng(latitude,longitude));
+                //map.setZoom(10);
+            }, 300);
+        }
+        function displayMarkers(latitude,longitude,markersData)
+        {
+            var userid = [];
+            var lat = [];
+            var lng = [];
+            // this variable sets the map bounds according to markers position
+            var bounds = new google.maps.LatLngBounds();
+            //console.log(markersData.length);
+            $.each(markersData,function(i)
+            {
+                console.log(markersData);
+                if(markersData[i].status=='1')
+                {
+                    if(!userid.includes(markersData[i].user_id))
+                    {
+                        userid.push(markersData[i].user_id);
+                        var latlng = new google.maps.LatLng(markersData[i].lat, markersData[i].lng);
+                        var name = markersData[i].title;
+                        var image = '<img src="' + markersData[i].image + '" alt="" style="width:50px; height:auto; padding: 10px;">';
+                        var link = markersData[i].link;
+                        var p_type = markersData[i].p_type;
+                        var price = markersData[i].price;
+                        var lend_price = markersData[i].lendprice;
+                        var shoplink = markersData[i].shop_link;
+                        if (p_type == '3') {
+                            console.log('Price:' + price);
+                        }
+                        createMarker(latlng, name, image, link, p_type, price, lend_price, shoplink);
+                        bounds.extend(latlng);
+                    }
+                }
+                else {
+                    if(!lat.includes(markersData[i].lat) && !lng.includes(markersData[i].lng))
+                    {
+                        lat.push(markersData[i].lat);
+                        lng.push(markersData[i].lng);
+                        var latlng = new google.maps.LatLng(markersData[i].lat, markersData[i].lng);
+                        var name = markersData[i].title;
+                        var image = '<img src="' + markersData[i].image + '" alt="" style="width:50px; height:auto; padding: 10px;">';
+                        var link = markersData[i].link;
+                        var p_type = markersData[i].p_type;
+                        var price = markersData[i].price;
+                        var lend_price = markersData[i].lendprice;
+                        var shoplink = markersData[i].shop_link;
+                        if (p_type == '3') {
+                            console.log('Price:' + price);
+                        }
+                        createMarker(latlng, name, image, link, p_type, price, lend_price, shoplink);
+                        bounds.extend(latlng);
+                    }
+                }
+            });
+            //console.log(markersData.length);
+            // for loop traverses markersData array calling createMarker function for each marker
+            /*for (var i = 0; i < markersData.length; i++){
+                var latlng = new google.maps.LatLng(markersData[i].lat, markersData[i].lng);
+                var name = markersData[i].title;
+                var image = '<img src="'+markersData[i].image+'" alt="" style="width:50px;">';
+                var link = markersData[i].link;
+                createMarker(latlng, name, image,link);
+                bounds.extend(latlng);
+               }*/
+            map.fitBounds(bounds);
+
+            // Finally the bounds variable is used to set the map bounds
+            // with fitBounds() function
+
+        }
+                function createMarker(latlng, name, image, link, p_type, price, lend_price, shoplink) {
+                    var marker = new google.maps.Marker({
+                        map: map,
+                        position: latlng,
+                        title: name,
+                        icon: icons['home'].icon
+                });
+
+                    // This event expects a click on a marker
+                    // When this event is fired the Info Window content is created
+                    // and the Info Window is opened.
+                    google.maps.event.addListener(marker, 'click', function () {
+
+                        // Creating the content to be inserted in the infowindow
+                        if(p_type=='3')
+                        {
+                            var iwContent =  '<div id="content" style="width:100%;text-align:center;">'+
+                                '<div id="siteNotice">'+
+                                '</div>'+
+                                '<h1 id="firstHeading" class="firstHeading" style="color:#ab8ce4;font-size:13px;"><i class="fa fa-repeat" style="color:#ab8ce4"></i>  '+ name +'</h1>'+
+                                '<div id="bodyContent">'+
+                                '<p style="color:#ab8ce4;"></p>' +
+                                ''+
+                                '<p><a href=' + link +'>'+
+                                image +'</a> '+
+                                '.</p>'+
+                                    '<p style="color:#ab8ce4;">'+price+''+lend_price+'</p>'+
+                                '<p style="text-align:right;font-size:16px;margin-bottom: 0rem !important;"><a href='+ shoplink +' style="text-align: right !important;"><i class="ti-arrow-top-right"></i></a></p>'+
+                                '</div>'+
+                                '</div>';
+                        }
+                        else
+                        {
+                            var iwContent =  '<div id="content" style="width:100%;text-align: center;">'+
+                                '<div id="siteNotice">'+
+                                '</div>'+
+                                '<h1 id="firstHeading" class="firstHeading" style="color:#d01c76;font-size:13px;"><i class="ti-location-pin" style="color:#d01c76"></i>  '+ name +'</h1>'+
+                                '<div id="bodyContent">'+
+                                '<p style="color:#d01c76;"></p>' +
+                                ''+
+                                '<p><a href=' + link +'>'+
+                                image +'</a> '+
+                                '.</p>'+
+                                '<p style="color:#d01c76">'+price+''+lend_price+'</p>'+
+                               '<p style="text-align:right;font-size:16px;margin-bottom:0rem !important;"><a href='+ shoplink +' style="text-align: right !important;"><i class="ti-arrow-top-right"></i></a></p>'+
+                                '</div>'+
+                                '</div>';
+                        }
 
 
-    <!-- ============================================================== -->
-    <!-- Right sidebar -->
-    <!-- ============================================================== -->
-    <!-- .right-sidebar -->
-    <!-- <script src="{{asset('assets/js/customer/dashboard_map.js')}}"></script> -->
-     <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD08Emygz5W4HKOZXvogXKb5zYjA8ZRMaQ&callback=initMap"></script>
-    <script type="text/javascript">
-        function initMap(){
-        var center = {lat: {{Auth::user()->lat}}, lng: {{Auth::user()->lng}}};
-  var locations = [
-  @foreach($friendstuff as $items)
-    ['<div class="gm-style-iw gm-style-iw-c" style="padding-right: 0px; padding-bottom: 0px; max-width: 360px!important; max-height: 236px;!important"><div class="gm-style-iw-d" style="overflow: scroll; max-width: 342px; max-height: 218px;"><div><div id="content"><div id="siteNotice"></div><h1 id="firstHeading" class="firstHeading" style="color:#d01c76;"><i class="ti-location-pin" style="color:#d01c76"></i> {{$items->p_title}}</h1><div id="bodyContent"><p style="color:#d01c76;">Collect from 8-9pm Tuesday</p><p><a href="https://contact25.com"><img style="width:50px;" src="https://contact25.com/uploads/small/7_800512.jpg" alt=""></a> <img style="width:50px;" src="https://contact25.com/uploads/small/7_802129.jpg" alt=""> <img style="width:50px;" src="https://contact25.com/uploads/small/7_800759.jpg" alt=""> <img style="width:50px;" src="https://contact25.com/uploads/small/7_800093.jpg" alt=""> <img style="width:50px;" src="https://contact25.com/uploads/small/7_800083.jpg" alt=""> .</p></div></div></div></div><button draggable="false" title="Close" aria-label="Close" type="button" class="gm-ui-hover-effect" style="background: none; display: block; border: 0px; margin: 0px; padding: 0px; position: absolute; cursor: pointer; user-select: none; top: -6px; right: -6px; width: 30px; height: 30px;"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224px%22%20height%3D%2224px%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23000000%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M19%206.41L17.59%205%2012%2010.59%206.41%205%205%206.41%2010.59%2012%205%2017.59%206.41%2019%2012%2013.41%2017.59%2019%2019%2017.59%2013.41%2012z%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M0%200h24v24H0z%22%20fill%3D%22none%22%2F%3E%0A%3C%2Fsvg%3E%0A" style="pointer-events: none; display: block; width: 14px; height: 14px; margin: 8px;"></button></div>',{{$items->userDet->lat}},{{$items->userDet->lng}}],
-   @endforeach 
-  ];
- 
+                        // including content to the Info Window.
+                        infoWindow.setContent(iwContent);
 
-var map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 9,
-    center: center
-  });
-var infowindow =  new google.maps.InfoWindow({});
-var marker, count;
-for (count = 0; count < locations.length; count++) {
-    marker = new google.maps.Marker({
-      position: new google.maps.LatLng(locations[count][1], locations[count][2]),
-      map: map,
-      title: locations[count][0]
-    });
-google.maps.event.addListener(marker, 'click', (function (marker, count) {
-      return function () {
-        infowindow.setContent(locations[count][0]);
-        infowindow.open(map, marker);
-      }
-    })(marker, count));
-  }
+                        // opening the Info Window in the current map and at the current marker location.
+                        infoWindow.open(map, marker);
+                    });
 
-}
-    </script>
-   
+                }
+
+        </script>
 
 @endsection

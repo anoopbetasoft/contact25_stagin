@@ -175,6 +175,11 @@
 					<i class="fa fa-cog u-mr-xsmall"></i>Account Settings
 				</a>
 			</li>
+			<li class="c-sidebar__item">
+				<a class="c-sidebar__link" href="{{url('/system_setting')}}">
+					<i class="fa fa-cog u-mr-xsmall"></i>System Settings
+				</a>
+			</li>
 
 			<li class="c-sidebar__item">
 				<a class="c-sidebar__link" target="_blank" href="register.html">

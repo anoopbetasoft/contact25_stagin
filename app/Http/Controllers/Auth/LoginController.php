@@ -83,7 +83,12 @@ class LoginController extends Controller
                     $response['message'] = "Login code has been sent to your mobile.";
                     $response['otpval'] = Hash::make($otp_no).'_tval_'.date('Y-m-d h:i:s');
                     $response['original_otp'] = $otp_no;
-                }else{
+                }
+                elseif($user['active_status']=='0')
+                {
+                    $response['error'] = ['password' => 'Your Account is suspended'];
+                }
+                else{
                     auth()->login($user);
                     $response['success'] = 200;
                 }
@@ -199,6 +204,7 @@ class LoginController extends Controller
                 $newUser->lng               = '';
                 $newUser->location          = '';
                 $newUser->timezone          = '';
+                $newUser->return_address    = '';
                 $newUser->save();
                 auth()->login($newUser, true);
             }elseif($provider == 'facebook'){
@@ -212,12 +218,25 @@ class LoginController extends Controller
                 $newUser->email_verified_at = date('Y-m-d h:i:s');
                 $newUser->avatar            = $user->avatar;
                 $newUser->avatar_type       = 2;
+                $newUser->lat               = '';
+                $newUser->lng               = '';
+                $newUser->location          = '';
+                $newUser->timezone          = '';
+                $newUser->return_address    = '';
                 $newUser->save();
                 auth()->login($newUser, true);
             }
             
         }
         return redirect()->to('/dashboard');
+    }
+
+    public function logout(Request $request)
+    {
+        //die('sfd');
+       // $this->guard('web_buyer')->logout();
+        Auth::logout();
+        return redirect('login');
     }
 
 }

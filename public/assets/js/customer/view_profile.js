@@ -1,6 +1,201 @@
 $('#countrylist option[value="United States of America"]').insertBefore('#countrylist option[value="Albania"]');
 $('#countrylist option[value="United Kingdom"]').insertBefore('#countrylist option[value="United States of America"]');
+function updatepolicy()
+{
+    var mainUrl = $("#weburl").val();
 
+        var refundrequest_status = 0;
+        if($('#refundrequest').is(':checked'))
+        {
+            refundrequest_status = 1;
+        }
+        var refundrequestdamage_status = 0;
+        if($('#refundrequestdamage').is(':checked'))
+        {
+            refundrequestdamage_status =1;
+        }
+        var refundrequestvalue = $('#refundrequestvalue').val();
+        var refundrequestdamagevalue = $('#refundrequestdamagevalue').val();
+        if(refundrequestvalue=='' || refundrequestdamagevalue=='')
+        {
+            Swal.fire("Please Enter Amount");
+            return false;
+        }
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.ajax({
+            type: 'POST',
+            url: mainUrl+"/update_return_option",
+            data:{"refundrequest_status":refundrequest_status,"refundrequest_value":refundrequestvalue,"refundrequestdamage_status":refundrequestdamage_status,"refundrequestdamage_value":refundrequestdamagevalue},
+            dataType : "json",
+            success: function(data) {
+                if(data.success == 1){
+                    Swal.fire("Success", "Update Successfull", "success");
+                }else{
+                    Swal.fire(data.message);
+                }
+            },
+            error: function(data) {
+                alert("Some error occured"); //location.reload(); return false;
+            }
+        });
+}
+
+function returnstatus()
+{
+	var mainUrl = $("#weburl").val();
+	var return_address = $('#return_address').val();
+	var return_label = '0';
+	if($('#checkbox1').is(':checked'))
+	{
+		return_label = '1';
+	}
+	$.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+    $.ajax({
+        type: 'POST',
+        url: mainUrl+"/update_return_status",
+        data:{"return_address":return_address,'return_label_status':return_label},
+        dataType : "json",
+        success: function(data) {
+            if(data.success == 1){
+             Swal.fire(
+            "Success", "Update Successfull", "success");
+            }else{
+                Swal.fire(data.message);
+            }
+        },
+        error: function(data) {
+            alert("Some error occured"); //location.reload(); return false;
+        }
+    });
+	
+}
+function updateinpostreturn()
+{
+	var mainUrl = $("#weburl").val();
+	var inpost_return = $('#inpost_return').val();
+	$.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+    $.ajax({
+        type: 'POST',
+        url: mainUrl+"/update_inpost_return",
+        data:{"inpost_return":inpost_return},
+        dataType : "json",
+        success: function(data) {
+            if(data.success == 1){
+                Swal.fire(
+            "Success", "Update Successfull", "success");
+            }else{
+                Swal.fire(data.message);
+            }
+        },
+        error: function(data) {
+            alert("Some error occured"); //location.reload(); return false;
+        }
+    });
+
+}
+function updatedelivery(id)
+{
+	var delivery_provider = $('#delivery_provider'+id).val();
+	var tracking_url = $('#tracking_url'+id).val();
+	var price = parseFloat($('#price'+id).val());
+	var description = $('#description'+id).val();
+	var status = $('#status'+id).val();
+	var mainUrl = $("#weburl").val();
+	$.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+    $.ajax({
+        type: 'POST',
+        url: mainUrl+"/update_delivery",
+        data:{"id":id,"delivery_provider":delivery_provider,"tracking_url":tracking_url,"price":price,"description":description,"status":status},
+        dataType : "json",
+        success: function(data) {
+            if(data.status == 1){
+            	$('#tbl_delivery_provider'+id).text(data.delivery_provider);
+            	$('#tbl_tracking_url'+id).text(data.tracking_url);
+                if(price=='' || price=='0')
+                {
+                    $('#tbl_price'+id).text('Free');
+                }
+                else
+                {
+                    $('#tbl_price'+id).text(data.price);
+                }
+                if(data.deliverystatus==1)
+                {
+                    $('#tbl_status'+id).attr('style', 'color:#00c292 !important');
+                    //$('#tbl_status'+id).css("color","#056838","!important");
+                    $('#tbl_status'+id).text('Live');
+                }
+                if(data.deliverystatus==0)
+                {
+                    //$('#tbl_status'+id).css("color","#D3D3D3","!important");
+                    $('#tbl_status'+id).attr('style', 'color:#D3D3D3 !important');
+                    $('#tbl_status'+id).text('Archive');
+                }
+            	$('#tbl_description'+id).text(data.description);
+
+            	$('#deliverymodal'+id).modal('toggle');
+                Swal.fire(
+            "Success", "Delivery Information Updated Successfully", "success");
+            }else{
+                Swal.fire(data.message);
+            }
+        },
+        error: function(data) {
+            alert("Some error occured"); //location.reload(); return false;
+        }
+    });
+
+}
+function updatedeliveryoption()
+{
+
+    var delivery_option = 1;
+    var mainUrl = $("#weburl").val();
+    if($('#delivery_option').is(':checked'))
+    {
+        delivery_option = 0;
+
+    }
+    $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+
+    $.ajax({
+        type: 'POST',
+        url: mainUrl+"/updatedeliveryoption",
+        data:{"delivery_option":delivery_option},
+        dataType : "json",
+        success: function(data) {
+            if(data.success == 1){
+                Swal.fire(
+            "Success", "Delivery Option Updated", "success");
+            }else{
+                Swal.fire(data.message);
+            }
+        },
+        error: function(data) {
+            alert("Some error occured"); //location.reload(); return false;
+        }
+    });
+}
 function updateorder()
 {
 	var order_status = 0;
@@ -9,6 +204,10 @@ function updateorder()
 	{
 		order_status = 1;
 	}
+	else
+    {
+        order_status = 0;
+    }
 	$.ajaxSetup({
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -44,6 +243,10 @@ function updatemessage()
 	{
 		update_message = 1;
 	}
+    else
+    {
+        update_message = 0;
+    }
 	$.ajaxSetup({
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -76,6 +279,10 @@ function updatecollectreminder()
 	{
 		collect_status = 1;
 	}
+    else
+    {
+        collect_status = 0;
+    }
 	$.ajaxSetup({
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -108,6 +315,10 @@ function updatecollectionreminder()
 	{
 		collection_status = 1;
 	}
+    else
+    {
+        collection_status = 0;
+    }
 	$.ajaxSetup({
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -139,6 +350,10 @@ function updatefriendstatus()
 	{
 		friend_status = 1;
 	}
+    else
+    {
+        friend_status = 0;
+    }
 	$.ajaxSetup({
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -205,7 +420,7 @@ function deletedelivery(data)
 	        success: function(data) {
 	        	if(data.status == 1)
 	        	{
-	        		$('#delivery'+id).css('display','none');
+	        		$('#delivery'+id).remove();
 
 	        	}
 
@@ -230,6 +445,7 @@ $("#deliveryclick").click(function (){
     	var delivery_provider = $('#delivery_provider').val();
     	var price = $('#price').val();
     	var tracking_url = $('#tracking_url').val();
+    	var description = $('#description').val();
     	$.ajaxSetup({
 		  headers: {
 		    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -238,13 +454,17 @@ $("#deliveryclick").click(function (){
 		$.ajax({
 	        type: 'POST',
 	        url: mainUrl+"/add_delivery",
-	        data:{'delivery_provider':delivery_provider,'tracking_url':tracking_url,'price':price},
+	        data:{'delivery_provider':delivery_provider,'tracking_url':tracking_url,'price':price,'description':description},
 	        success: function(data) {
 	        	if(data.status == 1)
-	        	{   $('#deliveries').css('display','block');
+	        	{   //$('#deliveries').css('display','block');
 	        		$('#delivery_provider').val('');
 	        		$('#tracking_url').val('');
-                    $("#deliveries").append('<div id=delivery'+data.id+'><div class="row"><div class="col-md-2 col-lg-2 col-xlg-2 col-sm-3 col-xs-6" style="width: auto; min-width: 0;"><div class="card" style="margin-bottom: 2px;"></div><p class="text-muted font-medium">'+data.delivery_provider+'</p></div><div class="col-md-5 col-lg-5 col-xlg-5 col-sm-6 col-xs-12" style="width: auto; min-width: 0;"><div class="card" style="margin-bottom: 2px;"></div><p class="text-muted font-medium">'+data.tracking_url+'</p></div><div class="col-md-2 col-lg-2 col-xlg-2 col-sm-3 col-xs-6" style="width: auto; min-width: 0;"><div class="card" style="margin-bottom: 2px;"></div><p class="text-muted font-medium">'+data.price+'</p></div><div class="col-md-3 col-lg-3 col-xlg-3 col-sm-6 col-xs-3"><div class="card padding-top:0px; margin-bottom: 12px;"><button type="button" class="btn btn-light remove_courier" data-courier_id="11" onclick="deletedelivery('+data.id+');"><i class="ti-close" aria-hidden="true"></i></button></div></div></div></div>');
+	        		$('#price').val('');
+	        		$('#description').val('');
+                    $("#deliveries").append('<tr id=delivery'+data.id+'><td id="tbl_delivery_provider'+data.id+'">'+data.delivery_provider+'</td><td id="tbl_tracking_url'+data.id+'">'+data.tracking_url+'</td><td> <p class="text-muted font-medium price" id="tbl_price'+data.id+'">'+data.price+'</p></td><td><p class="text-muted font-medium description" id="tbl_description'+data.id+'">'+data.description+'</p></td><td><p class="text-muted font-medium description" id="tbl_status'+data.id+'" style="color:#00c292!important;">Live</p></td><td><button type="button" class="btn btn-light remove_courier" data-toggle="modal" data-target="#deliverymodal'+data.id+'"><i class="ti-pencil" aria-hidden="true"></i></button></td></tr>');
+                    /*$('#popupdetails').append('<div class="modal fade" id=deliverymodal'+data.id+' tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"><div class="modal-dialog" role="document"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="exampleModalLabel">Edit</h5><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times</span></button></div><div class="modal-body"><div class="form-group"><form name="editdelivery"><label class="col-md-12">Courier / Delivery Provider</label><div class="col-md-12"><input type="text" id=delivery_provider'+data.id+' name="delivery_provider" placeholder="DHL / TNT / Yodel / Royal Mail" class="form-control form-control-line" value='+data.delivery_provider+'></div></div><div class="form-group"><label for="example-email" class="col-md-12">Tracking URL</label><div class="col-md-12"><input type="text" id=tracking_url'+data.id+' name="tracking_url" placeholder="https://courier-tracking-location" class="form-control form-control-line" name="example-email" value='+data.tracking_url+'></div></div><div class="form-group"><label for="example-email" class="col-md-12">Price</label><div class="col-md-12"><input type="text" id=price'+data.id+' name="price" placeholder="price" class="form-control form-control-line" value='+data.price+'></div></div><div class="form-group"><label for="example-email" class="col-md-12">Delivery Description</label><div class="col-md-12"><input type="text" id=description'+data.id+' name="description" placeholder="Delivery Description" class="form-control form-control-line" value='+data.description+'></div></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button><button type="button" class="btn btn-primary" onclick=updatedelivery('+data.id')>Save changes</button></div></form></div></div></div>');*/
+                $('#popupdetails').append('<div class="modal fade" id="deliverymodal'+data.id+'" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"> <div class="modal-dialog" role="document"> <div class="modal-content"> <div class="modal-header"> <h5 class="modal-title" id="exampleModalLabel">Edit</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </div> <div class="modal-body"> <div class="form-group"> <form name="editdelivery"><label class="col-md-12">Courier / Delivery Provider</label> <div class="col-md-12"> <input type="text" id="delivery_provider'+data.id+'" name="delivery_provider" placeholder="DHL / TNT / Yodel / Royal Mail" class="form-control form-control-line" value="'+data.delivery_provider+'"> </div> </div> <div class="form-group"> <label for="example-email" class="col-md-12">Tracking URL</label> <div class="col-md-12"> <input type="text" id="tracking_url'+data.id+'" name="tracking_url" placeholder="https://courier-tracking-location" class="form-control form-control-line" name="example-email" value="'+data.tracking_url+'"> </div> </div> <div class="form-group"> <label for="example-email" class="col-md-12">Price</label> <div class="col-md-12"> <input type="text" id="price'+data.id+'" name="price" placeholder="price" class="form-control form-control-line" value="'+data.price2+'"> </div> </div> <div class="form-group"> <label for="example-email" class="col-md-12">Delivery Description</label><p> <div class="col-md-12"> <textarea rows="10" cols="200" id="description'+data.id+'" name="description" placeholder="Delivery Description" class="form-control form-control-line deliverydescription" value="'+data.description+'">'+data.description+'</textarea> </div> </div><div class="form-group"> <label for="example-email" class="col-md-12">Status:</label><p> <div class="col-md-12"> <select class="form-control" name="status" id="status'+data.id+'"> <option value="0" selected>Archive</option> <option value="1" selected>Live</option> </select> </div> </div> </div> <div class="modal-footer"> <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> <button type="button" class="btn btn-primary" onclick="updatedelivery('+data.id+');">Save changes</button> </div> </form> </div> </div></div>');
 
 	        	}
 
@@ -549,6 +769,7 @@ $( document ).ready(function() {
 	        		$("#update_profile").find('.profile_success').css('display','block').html(data.message);
 	        		$('#addproductbutton').removeAttr("onclick");
 	        		$('#addproductbutton').attr("href","/add_product");
+                    Swal.fire('Updated','Profile Updated Successfully','success');
 	        	setTimeout( 
                     function(){
                         $(".profile_danger").hide();
@@ -556,6 +777,10 @@ $( document ).ready(function() {
                     } , 10000
                 );
 	        	}
+                else
+                {
+                    Swal.fire('Error',data.message,'warning');
+                }
 	        	//hide messages
 	        	
 	        },

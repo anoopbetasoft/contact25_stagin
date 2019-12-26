@@ -436,7 +436,15 @@ function add_opening_times(data) {
         dataType : "json",
         success: function(data) {
             if(data.success == 1){
-                $('.list_open_hours').append(data.message);
+                if(data.type=='update')
+                {
+                    $('#hour_id_'+data.id).remove();
+                    $('.list_open_hours').append(data.message);
+                }
+                else
+                {
+                    $('.list_open_hours').append(data.message);
+                }
                 $('.weekday').prop('selectedIndex',0);
                 $('.hours_start').prop('selectedIndex',18);
                 $('.hours_end').prop('selectedIndex',34);

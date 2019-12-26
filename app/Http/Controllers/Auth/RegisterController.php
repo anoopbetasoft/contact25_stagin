@@ -197,7 +197,8 @@ class RegisterController extends Controller
                         'lat'=>'',
                         'lng'=>'',
                         'location'=>'',
-                        'timezone'=>''
+                        'timezone'=>'',
+                        'return_address'=>''
                     ]);
                     $response['success'] = 200;
                     return response()->json($response);

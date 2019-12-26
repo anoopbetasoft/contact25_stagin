@@ -10,11 +10,18 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/home', 'HomeController@home')->name('home');
+#Google Map
+Route::post('/fetchproducts','HomeController@fetchproducts')->name('fetchproducts');
+Route::get('/logout', function(){
+      Auth::logout();
+  	  return redirect('/login');
+});
 
-Route::get('/', function () {
-    return view('welcome');
-})->middleware('guest');
-Route::get('/home', 'HomeController@home')->name('home')->middleware('guest');
+//Route::post('/logout', 'LoginController@logout');
+Route::get('/', 'HomeController@index')->middleware('guest')->name('homepage');
+Route::post('/newnearme','HomeController@newnearme')->middleware('guest')->name('newnearme');
+
 
 Route::get('/configcache', function () {
     $exitCode = Artisan::call('config:cache');
@@ -25,10 +32,18 @@ Auth::routes(['verify' => true]);
 
 #for users
 Route::group(['middleware' => ['checkLoginRole']], function () {
+    # My Money
+    Route::get('/my_money','MoneyController@my_money')->name('my_money');
+    #Create Merchant Account
+    Route::post('/create_merchant_account','MoneyController@create_merchant_account')->name('create_merchant_account');
+    #dashboard
 	Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
 	#Terms Page
 	Route::get('/terms', 'DashboardController@terms')->name('terms');
-
+    #Communication
+    Route::get('/communication','DashboardController@communication')->name('communication');
+    #token for twilio chat
+    Route::POST('/token','TokenController@generate')->name('generatetoken');
 	#Privacy Policy Page
 	Route::get('/privacy','DashboardController@privacy')->name('privacy');
 	#Find Friend
@@ -44,10 +59,16 @@ Route::group(['middleware' => ['checkLoginRole']], function () {
 	Route::post('/create-group','DashboardController@create_group')->name('create-group');
 	#Delete Group
 	Route::post('/delete-group','DashboardController@delete_group')->name('delete-group');
-
-
 	#for products
-	Route::get('/myproducts', 'DashboardController@product_list');
+	Route::get('/myproducts', 'DashboardController@product_list')->name('myproducts');
+	#Product List Ajax
+	Route::post('/product_list_ajax','DashboardController@product_list_ajax')->name('product_list_ajax');
+	#Product Box List Ajax
+	Route::post('/product_box_list_ajax','DashboardController@product_box_list_ajax')->name('product_box_list_ajax');
+	#Product according to box
+	Route::post('/product_box_ajax','DashboardController@product_box_ajax')->name('product_box_ajax');
+	#Product According to All Boxes
+	Route::post('/product_all_box_ajax','DashboardController@product_all_box_ajax')->name('product_all_box_ajax');
 	 //Route::get('/product_add','DashboardController@product_add')->name('product_add');
 	 //Route::get('/product_add/{id}','DashboardController@product_add')->name('product_add');
 	Route::get('/add_product/','DashboardController@add_product')->name('add_product');
@@ -57,21 +78,30 @@ Route::group(['middleware' => ['checkLoginRole']], function () {
 	Route::match(['get','post'], '/product_add_process','DashboardController@product_add_process')->name('product_add_process');
 	Route::post('/product_add_process', 'DashboardController@product_add_process')->name('product_add_process');
 
+	#Product Update
+	Route::post('/updateproduct','DashboardController@updateproduct')->name('updateproduct');
+
 	#for profi;e
 	Route::get('/view_profile', 'DashboardController@view_profile')->name('view_profile');
 	Route::post('/edit_profile', 'DashboardController@edit_profile')->name('edit_profile');
 	Route::post('/add_holiday','DashboardController@add_holiday')->name('add_holiday');
 	Route::post('/delete_holiday','DashboardController@delete_holiday')->name('delete_holiday');
 
+	#For Return Options
+    Route::post('/update_return_option','DashboardController@update_return_option')->name('update_return_option');
+
 	#enable 2 way auth
 	Route::post('/two_auth', 'DashboardController@two_auth')->name('two_auth');
 	Route::post('/two_auth_otp', 'DashboardController@two_auth_otp')->name('two_auth_otp');
 
+	#user shop listing
+    Route::get('/shop/{user_id}', 'DashboardController@shop_listing')->name('shop_listing');
 	#product listing
 	Route::get('/products', 'DashboardController@products_friends')->name('products_friends');
 
 	#Searching Bar
-	Route::post('/search','DashboardController@search')->name('search');
+	//Route::post('/search','DashboardController@search')->name('search');
+    Route::match(['get', 'post'],'/search','DashboardController@search')->name('search');
 
 	#product page
 	//Route::get('/products_page/{product_id}/{user_id}', 'DashboardController@products_page')->name('products_page');
@@ -90,10 +120,14 @@ Route::group(['middleware' => ['checkLoginRole']], function () {
 	Route::post('/update_communication','DashboardController@update_communication')->name('updatecommunication');
 	#Update Delivery
 	Route::post('/update_delivery','DashboardController@update_delivery')->name('updatedelivery');
+	#Update Delivery Option For Customer 
+	Route::post('/updatedeliveryoption','DashboardController@updatedeliveryoption')->name('updatedeliveryoption');
 	#Add Delivery
 	Route::post('/add_delivery','DashboardController@add_delivery')->name('adddelivery');
 	#Delete Delivery
 	Route::post('/delete_delivery','DashboardController@delete_delivery')->name('deletedelivery');
+	#Update Return Status Address & Return Label
+	Route::post('/update_return_status','DashboardController@update_return_status')->name('update_return_status');
 	#opening hours
 	Route::post('/addOpenHours', 'DashboardController@addOpenHours')->name('addOpenHours');
 	Route::post('/removeOpenHours', 'DashboardController@removeOpenHours')->name('removeOpenHours');
@@ -113,16 +147,66 @@ Route::group(['middleware' => ['checkLoginRole']], function () {
 	#save order
 	Route::post('/saveOrder', 'PaymentsController@saveOrder')->name('saveOrder');
 
+	#Free Order
+	Route::post('/freeorder', 'PaymentsController@freeorder')->name('freeorder');
+
+	#Pay With Credit
+    Route::post('/paywithcredit','PaymentsController@paywithcredit')->name('paywithcredit');
+
 	#list all my Orders
 	Route::get('/my_order', 'DashboardController@my_order')->name('my_order');
 
+	#list all my subscription
+    Route::get('/my_subscription','DashboardController@my_subscription')->name('my_subscription');
+
+    #list all subscribed users
+    Route::get('/subscribed_users','DashboardController@subscribed_users')->name('subscribed_users');
 	# success page display after successfull payment
 	Route::get('/success/{order_id}', 'DashboardController@success')->name('success');
 
+	# If the order is placed from credit amount
+    Route::get('/success/{order_id}/{discount}', 'DashboardController@success')->name('success');
+
 	#list all my sales
 	Route::get('/my_sales', 'DashboardController@my_sales')->name('my_sales');
+	#list all return requests
+    Route::get('/return_request','DashboardController@return_request')->name('return_request');
+    #accept inpost return request
+    Route::post('/accept_return_request_inpost','DashboardController@accept_return_request_inpost')->name('accept_return_request_inpost');
+    #accept return request
+    Route::post('/accept_return_request','DashboardController@accept_return_request')->name('accept_return_request');
+    #decline return request
+    Route::post('/decline_return_request','DashboardController@decline_return_request')->name('decline_return_request');
+    #refund return request
+    Route::post('/refund_return_request','DashboardController@refund_return_request')->name('refund_return_request');
+	#sales sorting ajax
+    Route::post('/my_sales_ajax', 'DashboardController@my_sales_ajax')->name('my_sales_ajax');
+	#seller cancel order 
+	Route::post('/cancelorder','DashboardController@cancelorder')->name('cancelorder');
+	# Update Tracking No
+	Route::post('/update_tracking_link','DashboardController@update_tracking_link')->name('update_tracking_link');
+	#seller complete order
+	Route::post('/completeorder','DashboardController@completeorder')->name('completeorder');
+	#seller collected order 
+	Route::post('/collectorder','DashboardController@collectorder')->name('collectorder');
+	#buyer cancel order
+	Route::post('/buyercancelorder','DashboardController@buyercancelorder')->name('buyercancelorder');
+	#buyer return order
+    Route::post('/buyerreturnorder','DashboardController@buyerreturnorder')->name('buyerreturnorder');
+	#buyer cancel subscription
+    Route::post('/buyercancelsubscription','DashboardController@buyercancelsubscription')->name('buyercancelsubscription');
+	#buyer claim it not delivered
+    Route::post('/claimitnotdelivered','DashboardController@claimitnotdelivered')->name('claimitnotdelivered');
+	#claim as delivered by buyer
+    Route::post('/buyerclaimdelivered','DashboardController@buyerclaimdelivered')->name('buyerclaimdelivered');
 	#INPOST LABEL
 	Route::get('/inpost_label/{id}', 'DashboardController@inpost_label')->name('inpost-label');
+	#Cancel Label
+    Route::get('/cancel_label/{parcel_id}','DashboardController@cancel_label')->name('cancel_label');
+    #View Label
+    Route::get('/view_label/{parcel_id}','DashboardController@view_label')->name('view_label');
+	#INPOST RETURN
+	Route::post('/update_inpost_return', 'DashboardController@update_inpost_return')->name('update_inpost_return');
 
 	#new product page
 	//Route::get('/add_product', 'DashboardController@add_product')->name('add_product');
@@ -133,9 +217,15 @@ Route::group(['middleware' => ['checkLoginRole']], function () {
 
 	#product page - service
 	Route::get('/add_pro_service', 'DashboardController@add_pro_service')->name('add_pro_service');
+    Route::get('/add_pro_service/{product_id}', 'DashboardController@add_pro_service')->name('edit_pro_service');
 
 	#product page - subscription
 	Route::get('/add_pro_subs', 'DashboardController@add_pro_subs')->name('add_pro_subs');
+    Route::get('/add_pro_subs/{product_id}', 'DashboardController@add_pro_subs')->name('edit_pro_subs');
+    #Google Map
+    Route::post('/fetchlocationproduct','DashboardController@fetchlocationproduct')->name('fetchlocationproduct');
+    #accept friend request through QR CODE
+    Route::post('/qr/{friend_id_1}/{friend_id_2}','DashboardController@qrcode')->name('qrcode');
 	
 });
 
@@ -147,6 +237,8 @@ Route::group(['middleware' => ['checkAdminRole']], function () {
 	Route::get('/customers', 'AdminController@customer_listing');
 	Route::post('/admin_two_auth', 'AdminController@admin_two_auth')->name('admin_two_auth');
 	Route::post('/admin_two_auth_otp', 'AdminController@admin_two_auth_otp')->name('admin_two_auth_otp');
+	Route::get('/system_setting', 'AdminController@system_setting')->name('system_setting');
+	Route::post('/system_setting', 'AdminController@system_setting')->name('system_setting_update');
 });
 
 #register

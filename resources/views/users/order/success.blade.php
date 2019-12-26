@@ -39,6 +39,11 @@
     margin-bottom: 1rem;
     background-color: transparent;
 }
+    @media (max-width:767px) {
+        table.table.table-inverse {
+            width: 100%;
+        }
+    }
 </style> 
 
      <div class="card success_page">
@@ -46,11 +51,17 @@
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="card-body">
+                                       @foreach($orderdetails as $order)
                                         <i class="fa fa-check-circle"></i>
-                                        <p>Your Payment Is Successfull.</p>
+                                        @if($order['o_total']=='0' || isset($discount))
+                                        <p>Your Order is Successful.</p>
                                          <p>Thank you. Your order has been received.</p>
-                                      
-                                         <table  class="table table-inverse" style="border:1px solid #ddd;"> 
+                                        @else
+                                        <p>Your Payment Is Successful.</p>
+                                         <p>Thank you. Your order has been received.</p>
+                                        @endif
+                                        @endforeach
+                                        <table  class="table table-inverse" style="border:1px solid #ddd;"> 
                                             <tbody>
                                                 @if(count($orderdetails) > 0)
                 @foreach($orderdetails as $order)
@@ -68,7 +79,43 @@
                                                 </tr>
                                                 <tr>
                                                    <td><strong>Total :</strong></td>
-                                                   <td>{{$order->currency->symbol}}{{$order['o_purchased_for']}}</td>
+                                                   <td>
+                                                       @php
+                                                           $order['o_total'] = number_format($order['o_total'],$decimal_place[0]['decimal_places']);
+                                                           $order['o_total'] = str_replace('.00','',$order['o_total']);
+                                                       @endphp
+                                                   @if($order['o_total']=='0')
+                                               {{$order->currency->symbol}}Free @else
+                                           {{$order->currency->symbol}}{{$order['o_total']}} 
+                                            @endif</td>
+                                                </tr>
+                                                @if(isset($discount))
+                                                    @php
+                                                        $discount = number_format($discount,$decimal_place[0]['decimal_places']);
+                                                        $discount = str_replace('.00','',$discount);
+                                                    @endphp
+                                                <tr>
+                                                    <td><strong>Discount:</strong></td>
+                                                    <td> {{$order->currency->symbol}}{{$discount}} </td>
+                                                </tr>
+                                                @endif
+                                                <tr>
+                                                    @php
+                                                        $order['o_delivery_charge'] = number_format($order['o_delivery_charge'],$decimal_place[0]['decimal_places']);
+                                                         $order['o_delivery_charge'] = str_replace('.00','',$order['o_delivery_charge']);
+                                                    @endphp
+                                                   <td><strong>Delivery Charge :</strong></td>
+                                                   <td>{{$order->currency->symbol}}{{$order['o_delivery_charge']}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Delivery Provider :</strong></td>
+                                                     @if($order['o_delivery_provider']=='inpost')
+                                                     <td>Inpost Next Day</td>
+                                                     @elseif($order['o_delivery_provider']=='0')
+                                                     <td>None</td>
+                                                     @elseif($order['o_delivery_provider']!='0' && $order['o_delivery_provider']!='inpost')
+                                                     <td>{{$order->deliveryprovider->delivery_provider}}</td>
+                                                   @endif
                                                 </tr>
                                                <!-- <tr>
                                                    <td><strong>Order Status :</strong></td>

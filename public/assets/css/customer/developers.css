@@ -59,8 +59,10 @@ a,a label {
 
 .product-img img {
     max-width: 256px;
-    height: 200px;
+    /*height: 200px;*/
    /* object-fit: cover;*/
+    max-height: 200px;
+    height: auto;
     object-fit:  contain
 }
 .buy-page h3{
@@ -88,7 +90,7 @@ ul.product_page_ul {
 @media (min-width:1600px){
     .product-img img {
         max-width: 389px;
-        height: 200px;
+        max-height: 200px;
         /*object-fit: cover;*/
         object-fit:  contain
     }

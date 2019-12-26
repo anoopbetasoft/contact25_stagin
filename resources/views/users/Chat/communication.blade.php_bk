@@ -1,0 +1,147 @@
+@extends('layouts.customer')
+
+
+@section('content')
+  @if(session()->has('message'))
+    <div class="alert alert-success">
+      {{ session()->get('message') }}
+    </div>
+  @elseif(session()->has('error'))
+    <div class="alert alert-danger">
+      {{ session()->get('error') }}
+    </div>
+  @endif
+  <style>
+    button.btn.btn-danger {
+      margin-bottom: 10px;
+    }
+
+
+
+
+    @media (max-width:360px)
+    {
+      .btn-danger {
+        color: #fff;
+        background-color: #e46a76;
+        border-color: #e46a76;
+        font-size: 10px;
+        padding: 5px;
+      }
+
+
+      span.font-normal {
+        FONT-SIZE: 11PX;
+      }
+    }
+
+
+
+  </style>
+  <div class="col-sm-12 tk-admin-info">
+
+    <h1 class="text-center tk-docx-main-heading">Communication</h1>
+
+    <h4 class="text-center">With customer Yog Raj</h4>
+    <input type="hidden" class="current_user" value="antony@contact25.com">
+    <input type="hidden" id="new-channel-input" value="MjA4Mw==">
+    <input type="hidden" id="customer_name" value="Yog Raj">
+    <input type="hidden" id="customer_email" value="stamp@yopmail.com">
+    <input type="hidden" id="provider_name" value="Yog Raj">
+    <input type="hidden" id="provider_email" value="stamp@yopmail.com">
+    <div class="page-titles">
+
+
+
+      <div class="card rt_roster_card" style="margin-bottom:10px">
+
+        <div class="rt_roster_outer">
+
+          <div class="rt_roster_1">
+
+            <h5>Communication on Order ID : 2083</h5>
+
+          </div>
+
+          <div class="cst_roster_3">
+
+            <button type="submit" class="btn btn-default pt-profile theme-btn my_roster_btn" onclick="location.href='http://test.stampmemoriesuat.com/communications'">Return to previous screen</button>
+
+          </div>
+
+          <div class="cst_roster_2">
+
+            <button type="button" data-toggle="modal" data-target="#exampleModal" href="javascript:void(0)" data-id="90" class="btn btn-default pt-profile theme-btn my_roster_btn">Call</button>
+
+          </div>
+
+
+
+
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="col-md-12 col-xs-12">
+      <div class="card card_communication">
+
+
+
+        <div class="container-fluid">
+
+          <div class="row">
+
+            <div class="col-md-12">
+
+
+
+              <div id="status-row" class="row disconnected">
+
+
+
+
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div id="container" class="row">
+
+
+
+            <div id="chat-window" class="col-md-12">
+
+              <div id="message-list" class="row disconnected"></div>
+
+              <div id="typing-row" class="row disconnected">
+
+                <p id="typing-placeholder"></p>
+
+              </div>
+
+              <form name="order_communication" id="order_communication" novalidate>
+                <input name="sender_id" class="sender_id" value="756" type="hidden">
+                <input name="receiver_id" class="receiver_id" value="756" type="hidden">
+                <input name="order_id" class="order_id" value="2083" type="hidden">
+                <div id="input-div" class="row">
+                  <div class="col-md-11 col-xs-9">
+                    <textarea id="input-text" disabled="true" placeholder="Your message" class="not_shadow" name="message"></textarea>
+                  </div>
+                  <div class="col-md-1 col-xs-3 text-right">
+                    <button type="click" class="btn btn-info btn-circle btn-lg send_btn_chat"><i class="fa fa-paper-plane-o"></i> </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end tk-admin-info -->
+

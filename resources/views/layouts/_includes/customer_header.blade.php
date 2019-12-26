@@ -1,3 +1,6 @@
+@php
+$notification = App\item_order_notification::where('user_id',Auth::user()->id)->where('status','0')->get();
+@endphp
 <!-- header-->
 <nav class="navbar top-navbar navbar-expand-md navbar-dark">
     <!-- ============================================================== -->
@@ -71,6 +74,48 @@
             <!-- ============================================================== -->
             <!-- Messages -->
             <!-- ============================================================== -->
+                @if(count($notification)>'0')
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle waves-effect waves-dark" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="ti-email"></i>
+                        @if(count($notification)>'0') <div class="notify"> <span class="heartbit"></span> <span class="point"></span> </div>
+                            @endif
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right mailbox animated bounceInDown">
+                        <ul>
+                            <li>
+                                <div class="drop-title">Notifications</div>
+                            </li>
+                            @if(count($notification)>'0')
+                            <li>
+                                <div class="message-center ps ps--theme_default" data-ps-id="551c595a-7e0d-c4da-fc59-a1e3ea3cdbe3">
+                                    <!-- Message -->
+                                    @foreach($notification as $notifications)
+                                    <a href="{{url($notifications->link)}}" style="width: 900px;">
+                                        <div class="btn btn-danger btn-circle"><i class="fa fa-link"></i></div>
+                                        <div class="mail-contnet">
+                                            <h5>Order Reminder</h5>
+                                            @if($notifications->type=='seller')
+                                            <span class="mail-desc">You Have An Order For Collection</span> {{--<span class="time">9:30 AM</span>--}}
+                                            @elseif($notifications->type=='buyer')
+                                                <span class="mail-desc">You Have An Order To Collect</span>
+                                            @endif
+                                        </div>
+                                    </a>
+                                    @endforeach
+
+                                    <div class="ps__scrollbar-x-rail" style="left: 0px; bottom: 0px;"><div class="ps__scrollbar-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__scrollbar-y-rail" style="top: 0px; right: 0px;"><div class="ps__scrollbar-y" tabindex="0" style="top: 0px; height: 0px;"></div></div></div>
+                            </li>
+                                @else
+                                <li><a href=""><div class="mail-contnet"><h5>You have no notification</h5></div></a></li>
+
+                            @endif
+                            {{--<li>
+                                <a class="nav-link text-center link" href="javascript:void(0);"> <strong>Check all notifications</strong> <i class="fa fa-angle-right"></i> </a>
+                            </li>--}}
+                        </ul>
+                    </div>
+                </li>
+                @endif
             <li class="nav-item dropdown">
                 <a class="nav-link waves-effect waves-dark" href="{{url('/myproducts')}}" aria-haspopup="true" aria-expanded="false"><i class="ti-package"></i></a>
             </li>
@@ -129,9 +174,11 @@
                                            
                                             @endphp
                                             <a href="/my_sales">
-                                                <div class="user-img"> <img src='{{asset("uploads/products/$image[0]")}}' alt="user" class="img-circle"> <span class="profile-status online pull-right"></span> </div>
+                                                <div class="user-img"> @if($image[0]!='')<img src='{{asset("uploads/products/$image[0]")}}' alt="user">@else <img src='{{asset("assets/images/logo-balls.png")}}' alt="user"> @endif <span class="profile-status online pull-right"></span> </div>
                                                 <div class="mail-contnet">
-                                                    <h5>{{$sales->p_title}}</h5> <span class="mail-desc"></span> <span class="time">{{$days}} Days {{$hours}} Hours</span><i class="fa fa-truck" style="color:#9675ce;"> </i><span style="color:#9675ce;"> Deliver</span></div>
+                                                    <h5>{{$sales->p_title}}</h5> <span class="mail-desc"></span>
+
+                                                    <span class="time">{{$days}} Days {{$hours}} Hours</span><i class="fa fa-truck" style="color:#9675ce;"> </i><span style="color:#9675ce;"> Deliver</span></div>
                                             </a>
                                             <!-- Message -->
                                             @endforeach

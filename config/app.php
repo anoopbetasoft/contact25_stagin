@@ -162,7 +162,7 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         Stevebauman\Location\LocationServiceProvider::class,
-        Ixudra\Curl\CurlServiceProvider::class,
+        \Torann\GeoIP\GeoIPServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -178,7 +178,9 @@ return [
         App\Providers\RouteServiceProvider::class,
         Laravel\Socialite\SocialiteServiceProvider::class,
         Lab404\Impersonate\ImpersonateServiceProvider::class,
-        Libern\Timezone\TimezoneServiceProvider,
+        JFuentesTgn\OcrSpace\OcrServiceProvider::class,
+        App\Providers\TwilioAccessTokenProvider::class,
+        App\Providers\TwilioIPMGrantProvider::class,
 
 
     ],
@@ -232,7 +234,8 @@ return [
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,
         'Location' => 'Stevebauman\Location\Facades\Location',
         'Carbon' => 'Carbon\Carbon',
-        'Curl' => Ixudra\Curl\Facades\Curl::class,
+        'GeoIP' => \Torann\GeoIP\Facades\GeoIP::class,
+        'OCR' => JFuentesTgn\OcrSpace\OcrFacade::class,
 
     ],
 

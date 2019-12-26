@@ -1,6 +1,7 @@
 
 <html>
  <head>
+     <meta name="csrf-token" content="{{ csrf_token() }}">
    <style>
        html, body, #map-canvas {
         height: 100%;
@@ -17,7 +18,6 @@
         outline: none;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
       }
-
       #pac-input {
        background-color: #fff;
     font-family: Roboto;
@@ -63,71 +63,189 @@
  </head>
 <body>
     <input id="pac-input" class="controls" type="text" placeholder="Search Box">
-    <div  id="map-canvas"></div>
+    <div id="map"></div>
+</body>
+</html>
 
-	
-    <script type="text/javascript">
-        function initMap(){
-         var center = {lat: 51.5073509, lng: 76.71787259999996};
-  var locations = [
-  @foreach($friendstuff as $items)
-  [
-    @if(empty($p['p_image']))
-      @php
-          $images ='<img src=url(assets/images/logo-balls.png) alt=product image style=width: 100%>';
-      @endphp
-  @else
-      @php
-   $p_img_arr = explode(',', $p['p_image']);
-      @endphp
-      @if(count($p_img_arr) > 1)
-      @foreach($p_img_arr as $key=>$img)
-      @php
-          $images = '<div class=carousel-item @if($key == 0) active @endif><img class=d-block w-100 src=url(uploads/products/$img) alt=Second slide style=width: 100%; margin: 0 auto;>';
-      @endphp
-      @endforeach
-      @else
-        @php 
-        $images = "<img class='' src=url(uploads/products/$p_img_arr[0]) style=width: 100%>";
-        @endphp
-      @endif
-    @endif
-  @if($items->p_type=='2' && $items->p_location!='')
-  @php
-  $latlng = explode(',',$items->p_location);
-  @endphp
-  '<div id="content"><div id="siteNotice"></div><h1 id="firstHeading" class="firstHeading">{{$items->p_title}}</h1><div id="bodyContent"><p>{{$items->p_description}}</p><p><a href="/login">Click To Get Service/Product</a></p>{{$images}}</div></div>',{{$latlng['0']}},{{$latlng['1']}}
-  @else
-    '<div id="content"><div id="siteNotice"></div><h1 id="firstHeading" class="firstHeading">{{$items->p_title}}</h1><div id="bodyContent"><p>{{$items->p_description}}</p><p><a href="/login">Click To Get Service/Product</a></p>{{$images}}</div></div>',{{$items->userDet->lat}},{{$items->userDet->lng}}
-    @endif
-    ],
-   @endforeach 
-  ];
- 
-
-var map = new google.maps.Map(document.getElementById('map-canvas'), {
-    zoom: 4,
-    center: center
-  });
-var infowindow =  new google.maps.InfoWindow({});
-var marker, count;
-for (count = 0; count < locations.length; count++) {
-    marker = new google.maps.Marker({
-      position: new google.maps.LatLng(locations[count][1], locations[count][2]),
-      map: map,
-      title: locations[count][0]
-    });
-google.maps.event.addListener(marker, 'click', (function (marker, count) {
-      return function () {
-        infowindow.setContent(locations[count][0]);
-        infowindow.open(map, marker);
-      }
-    })(marker, count));
-  }
-
-}
-    </script>
     <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD08Emygz5W4HKOZXvogXKb5zYjA8ZRMaQ&callback=initMap"></script>
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD08Emygz5W4HKOZXvogXKb5zYjA8ZRMaQ"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            if (localStorage.getItem("latitude") === null || localStorage.getItem("latitude") === "") {
+                initGeolocation();
+            }
+            function initGeolocation() {
+                if (navigator && navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+                } else {
+                    console.log('Geolocation is not supported');
+                }
+            }
+
+            function errorCallback() {
+                localStorage.setItem("latitude","");
+                localStorage.setItem("longitude","");
+
+            }
+
+            function successCallback(position) {
+                localStorage.setItem("latitude",position.coords.latitude);
+                localStorage.setItem("longitude",position.coords.longitude);
+
+            }
+
+        });
+
+    </script>
+<script type="text/javascript">
+
+    var map;
+    var infoWindow;
+    var markersData = [];
+    var mainUrl = '';
+    var lat = $('#lat').val();
+    var lng = $('#lng').val();
+    var icons = {
+        shop: {
+            icon:  'assets/googlemap/orange.png'
+        },
+        home: {
+            icon: 'assets/googlemap/purple.png'
+        },
+        hotspot: {
+            icon: 'assets/googlemap/red.png'
+        }
+    };
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    console.log($('meta[name="csrf-token"]').attr('content'));
+    $.ajax({
+        type: 'POST',
+        url: mainUrl+'/fetchproducts',
+        dataType : 'json',
+        data:{'country':'<?php echo $location['country']; ?>'},
+        success: function(data) {
+            console.log(data);
+            markersData = data;
+            initialize(lat,lng);
+
+        },
+        error: function(data) {
+            alert("Some error occured"); //location.reload(); return false;
+            console.log();
+        }
+    });
+    function initGeolocation() {
+        if (navigator && navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+        } else {
+            console.log('Geolocation is not supported');
+        }
+    }
+    function errorCallback() {
+        localStorage.setItem("latitude","");
+        localStorage.setItem("longitude","");
+
+    }
+
+    function successCallback(position) {
+        localStorage.setItem("latitude",position.coords.latitude);
+        localStorage.setItem("longitude",position.coords.longitude);
+
+    }
+
+    function initialize(latitude,longitude)
+    {
+        var mapOptions = {
+            center: new google.maps.LatLng(latitude,longitude),
+            zoom: 10,
+            mapTypeId: 'roadmap',
+            gestureHandling: 'greedy',
+            styles: [{"featureType":"administrative","elementType":"geometry.fill","stylers":[{"color":"#d6e2e6"}]},{"featureType":"administrative","elementType":"geometry.stroke","stylers":[{"color":"#cfd4d5"}]},{"featureType":"administrative","elementType":"labels.text.fill","stylers":[{"color":"#7492a8"}]},{"featureType":"administrative.neighborhood","elementType":"labels.text.fill","stylers":[{"lightness":25}]},{"featureType":"landscape.man_made","elementType":"geometry.fill","stylers":[{"color":"#dde2e3"}]},{"featureType":"landscape.man_made","elementType":"geometry.stroke","stylers":[{"color":"#cfd4d5"}]},{"featureType":"landscape.natural","elementType":"geometry.fill","stylers":[{"color":"#dde2e3"}]},{"featureType":"landscape.natural","elementType":"labels.text.fill","stylers":[{"color":"#7492a8"}]},{"featureType":"landscape.natural.terrain","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"poi","elementType":"geometry.fill","stylers":[{"color":"#dde2e3"}]},{"featureType":"poi","elementType":"labels.text.fill","stylers":[{"color":"#588ca4"}]},{"featureType":"poi","elementType":"labels.icon","stylers":[{"saturation":-100}]},{"featureType":"poi.park","elementType":"geometry.fill","stylers":[{"color":"#a9de83"}]},{"featureType":"poi.park","elementType":"geometry.stroke","stylers":[{"color":"#bae6a1"}]},{"featureType":"poi.sports_complex","elementType":"geometry.fill","stylers":[{"color":"#c6e8b3"}]},{"featureType":"poi.sports_complex","elementType":"geometry.stroke","stylers":[{"color":"#bae6a1"}]},{"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#41626b"}]},{"featureType":"road","elementType":"labels.icon","stylers":[{"saturation":-45},{"lightness":10},{"visibility":"on"}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#c1d1d6"}]},{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#a6b5bb"}]},{"featureType":"road.highway","elementType":"labels.icon","stylers":[{"visibility":"on"}]},{"featureType":"road.highway.controlled_access","elementType":"geometry.fill","stylers":[{"color":"#9fb6bd"}]},{"featureType":"road.arterial","elementType":"geometry.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"road.local","elementType":"geometry.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"transit","elementType":"labels.icon","stylers":[{"saturation":-70}]},{"featureType":"transit.line","elementType":"geometry.fill","stylers":[{"color":"#b4cbd4"}]},{"featureType":"transit.line","elementType":"labels.text.fill","stylers":[{"color":"#588ca4"}]},{"featureType":"transit.station","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"transit.station","elementType":"labels.text.fill","stylers":[{"color":"#008cb5"},{"visibility":"on"}]},{"featureType":"transit.station.airport","elementType":"geometry.fill","stylers":[{"saturation":-100},{"lightness":-5}]},{"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#a6cbe3"}]}]
+        };
+
+        map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+        // a new Info Window is created
+        infoWindow = new google.maps.InfoWindow();
+
+        // Event that closes the Info Window with a click on the map
+        google.maps.event.addListener(map, 'click', function() {
+            infoWindow.close();
+        });
+
+        // Finally displayMarkers() function is called to begin the markers creation
+        displayMarkers(latitude,longitude);
+        setTimeout(function(){
+            map.setCenter(new google.maps.LatLng(latitude,longitude));
+            map.setZoom(10);
+        }, 300);
+    }
+    function displayMarkers(latitude,longitude)
+    {
+        // this variable sets the map bounds according to markers position
+        var bounds = new google.maps.LatLngBounds();
+
+        // for loop traverses markersData array calling createMarker function for each marker
+        for (var i = 0; i < markersData.length; i++){
+
+            var latlng = new google.maps.LatLng(markersData[i].lat, markersData[i].lng);
+            var name = markersData[i].title;
+            //var address1 = markersData[i].address1;
+            var image = '<img src="'+markersData[i].image+'" alt="" style="width:50px;">';
+            var link = markersData[i].link;
+            // var postalCode = markersData[i].postalCode;
+            // var cat = markersData[i].cat;
+            // var price = markersData[i].price;
+
+            createMarker(latlng, name, image,link);
+
+            // marker position is added to bounds variable
+            bounds.extend(latlng);
+        }
+
+        // Finally the bounds variable is used to set the map bounds
+        // with fitBounds() function
+        map.fitBounds(bounds);
+    }
+    function createMarker(latlng, name, image, link) {
+        var marker = new google.maps.Marker({
+            map: map,
+            position: latlng,
+            title: name,
+            icon: icons['home'].icon
+        });
+        // This event expects a click on a marker
+        // When this event is fired the Info Window content is created
+        // and the Info Window is opened.
+        google.maps.event.addListener(marker, 'click', function () {
+
+            // Creating the content to be inserted in the infowindow
+            var iwContent =  '<div id="content">'+
+                '<div id="siteNotice">'+
+                '</div>'+
+                '<h1 id="firstHeading" class="firstHeading" style="color:#d01c76;"><i class="ti-location-pin" style="color:#d01c76"></i>'+ name +'</h1>'+
+                '<div id="bodyContent">'+
+                '<p style="color:#d01c76;"></p>' +
+                ''+
+                '<p><a href=' + link +'>'+
+                image +'</a> '+
+                '.</p>'+
+                '</div>'+
+                '</div>';
+
+            // including content to the Info Window.
+            infoWindow.setContent(iwContent);
+
+            // opening the Info Window in the current map and at the current marker location.
+            infoWindow.open(map, marker);
+        });
+
+    }
+</script>
 </body> 
 </html>

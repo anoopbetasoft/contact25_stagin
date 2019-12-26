@@ -21,6 +21,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'currency_code',
+        'currency_symbol',
         'contact_no',
         'role_id',
         'facebook_id',
@@ -56,7 +58,18 @@ class User extends Authenticatable implements MustVerifyEmail
         'location',
         'timezone',
         'box_preference',
-        'reject_count'
+        'reject_count',
+        'active_status',
+        'sale_cancel_count',
+        'inpost_return',
+        'return_address',
+        'return_label_status',
+        'delivery_option',
+        'refundrequest_status',
+        'refundrequest_value',
+        'refundrequestdamage_status',
+        'refundrequestdamage_value',
+        'wallet'
     ];
 
     /**

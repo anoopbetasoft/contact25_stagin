@@ -28,6 +28,29 @@ $('#email').keypress(function(){
         });
 
 });
+$("#friendscheckall").change(function () {
+   // alert('multi check selected');
+    if($(this).prop("checked")) {
+        $(".friendcheck").prop('checked', $(this).prop('checked'));
+        //alert('checkall called');
+    }
+    else
+    {
+        $(".friendcheck").prop("checked",false);
+    }
+});
+
+$(".friendcheck").change(function(){
+    if (!$(this).prop("checked")){
+        $("#friendscheckall").prop("checked",false);
+       // alert('single check called');
+    }
+    /*else
+    {
+        $("#friendscheckall").prop("checked",true);
+    }*/
+});
+
 function showprofileerror()
 {
      Swal.fire(
@@ -167,7 +190,7 @@ function deletefriendrequest(id,friend_list_1)
             }
         });
 }
-function friendscheckall()
+/*function friendscheckall()
 {
       if($('#friendscheckall').prop('checked') == false)
       {
@@ -178,7 +201,7 @@ function friendscheckall()
         $('.friendcheck').prop('checked', false);
       }
       
-}
+}*/
 function friendscheckall2(id)
 {
       if($('#friend'+id).prop('checked') == false)
@@ -197,8 +220,9 @@ function friendscheckall2(id)
     });*/
 
 
-$(function () {
-    "use strict";
+ /*$(function () {
+     "use strict";*/
+    
     //This is for the Notification top right
     /*$.toast({
             heading: 'Welcome to Elite admin'
@@ -210,7 +234,8 @@ $(function () {
             , stack: 6
         })*/
         // Dashboard 1 Morris-chart
-    Morris.Area({
+    
+    /*Morris.Area({
         element: 'morris-area-chart'
         , data: [{
                 period: '2010'
@@ -333,4 +358,4 @@ $(function () {
             clearTimeout(sparkResize);
             sparkResize = setTimeout(sparklineLogin, 500);
         });
-        sparklineLogin();
+        sparklineLogin();*/

@@ -12,6 +12,9 @@ use DB;
 use Redirect;
 use App\User;
 use App\Role;
+use App\system_setting;
+use App\return_setting;
+use Session;
 
 class AdminController extends Controller
 {
@@ -78,6 +81,52 @@ class AdminController extends Controller
 		$uDetails = User::where('id',$userId)->get();
 		return view('admin.account_setting', compact("uDetails","userId"));
 	}
+	/*
+	 * System Setting
+	 */
+    public function system_setting(Request $request)
+    {
+
+        if($request['inpost_amount'])
+        {
+            $inpost_amount = $request['inpost_amount'];
+            $clear_credit_period = $request['clear_credit_period'];
+            $credit_discount = $request['credit_discount'];
+            $clear_credit_period_service = $request['clear_credit_period_service'];
+            $remind_time = $request['remind_time'];
+            $product_not_delivered_limit = $request['product_not_delivered_limit'];
+            $product_cancel_limit_seller = $request['product_cancel_limit_seller'];
+            $no_of_day_for_claim = $request['no_of_day_for_claim'];
+            system_setting::where('status','1')->update(['status'=>'0']);
+            system_setting::create(['inpost_amount'=>$inpost_amount,'clear_credit_period'=>$clear_credit_period,'credit_discount'=>$credit_discount,'remind_time'=>$remind_time,'clear_credit_period_service'=>$clear_credit_period_service,'status'=>'1','product_cancel_limit_seller'=>$product_cancel_limit_seller,'product_not_delivered_limit'=>$product_not_delivered_limit,'no_of_day_for_claim'=>$no_of_day_for_claim,'created_at'=>date('Y-m-d H:i:s')]);
+            Session::flash('message', 'New Policy Created Successfully');
+            return back();
+        }
+        if($request['inpost_return_amount'])
+        {
+            $days_allowed_for_refund = $request['days_allowed_for_refund'];
+            $credit_limit_refund = $request['credit_limit_refund'];
+            $inpost_return_amount = $request['inpost_return_amount'];
+            $days_allowed_for_return_label = $request['days_allowed_for_return_label'];
+            $product_returning_limit = $request['product_returning_limit'];
+            return_setting::where('status','1')->update(['status'=>'0']);
+            return_setting::create(['days_allowed_for_refund'=>$days_allowed_for_refund,'credit_limit_refund'=>$credit_limit_refund,'inpost_return_amount'=>$inpost_return_amount,'days_allowed_for_return_label'=>$days_allowed_for_return_label,'status'=>'1','product_returning_limit'=>$product_returning_limit,'created_at'=>date('Y-m-d H:i:s')]);
+            Session::flash('message', 'New Policy Created Successfully');
+            return back();
+        }
+        else {
+            $userId = Auth::id();
+
+            #get users' detail
+            $uDetails = User::where('id', $userId)->get();
+            $systemsettting = system_setting::where('status','1')->get();
+            $oldpolicy = system_setting::where('status','0')->get();
+            $returnsetting = return_setting::where('status','1')->get();
+            $oldreturnpolicy = return_setting::where('status','0')->get();
+            return view('admin.system_setting', compact("uDetails", "userId", "systemsettting","oldpolicy","returnsetting","oldreturnpolicy"));
+        }
+
+    }
 
 	/*
 	save 2 auth value

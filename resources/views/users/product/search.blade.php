@@ -17,7 +17,7 @@
 		@if(count($product_list) > 0)
 		<div class="col-lg-12">
 		<h2>Search results for '{{$keyword}}'</h2>
-		</div>	
+		</div>
 			@foreach($product_list as $p)
 			@php
 			$product_repeat = 0;
@@ -30,7 +30,7 @@
 			@if(in_array('1',$sell_to) || in_array('2',$sell_to) || in_array('3',$sell_to) || in_array('1',$lend_to) || in_array('2',$lend_to) || in_array('3',$lend_to) && $sellercountry[0]['country']==Auth::user()->country) 
 			@php
 			$product_repeat = $p['id'];
-			@endphp 
+			@endphp
 			<div class="col-lg-3">
 	            <div class="card">
 	            	<div class="white-box-pd buy-page" data-s_id="814440">
@@ -81,6 +81,12 @@
 			                	<!-- <span data-toggle="tooltip" data-placement="top" title=" Item">
 			                		<i class="fa fa-archive"></i>
 			                	</span> -->
+								@php
+									$p['p_selling_price'] = number_format($p['p_selling_price'],$decimal_place[0]['decimal_places']);
+                                    $p['p_selling_price'] = str_replace('.00','',$p['p_selling_price']);
+								$p['p_lend_price'] = number_format($p['p_lend_price'],$decimal_place[0]['decimal_places']);
+                                    $p['p_lend_price'] = str_replace('.00','',$p['p_lend_price']);
+								@endphp
 			                	<span data-toggle="tooltip" class="text-info" data-placement="top" title="Selling Price">
 			                		<i class="fa fa-tag"></i>   {{$p->currency->symbol}}@if($p['p_selling_price']=='0'){{'Free'}}@else{{$p['p_selling_price']}}@endif
 			                	</span>
@@ -106,6 +112,10 @@
 			                	<!-- <span data-toggle="tooltip" data-placement="top" title=" Membership">
 			                		<i class="fa fa-archive"></i>
 			                	</span> -->
+								@php
+									$p['p_selling_price'] = number_format($p['p_selling_price'],$decimal_place[0]['decimal_places']);
+                                    $p['p_selling_price'] = str_replace('.00','',$p['p_selling_price']);
+								@endphp
 		                		<span data-toggle="tooltip" class="text-info" data-placement="top" title="Selling Price">
 				                	<i class="fa fa-tag"></i> {{$p->currency->symbol}}@if($p['p_selling_price']=='0'){{'Free'}}@else{{$p['p_selling_price']}}@endif
 				                </span>
@@ -170,6 +180,10 @@
 			                	<!-- <span data-toggle="tooltip" data-placement="top" title=" Subsription">
 			                		<i class="fa fa-archive"></i>
 			                	</span> -->
+								@php
+									$p['p_subs_price'] = number_format($p['p_subs_price'],$decimal_place[0]['decimal_places']);
+                                    $p['p_subs_price'] = str_replace('.00','',$p['p_subs_price']);
+								@endphp
 			                	<span data-toggle="tooltip" data-placement="top" class="text-purple"  title="Subscription/Membership Price">
 			                		<i class="fa fa-refresh"></i>  {{$p->currency->symbol}}@if($p['p_subs_price']=='0'){{'Free'}}@else {{$p['p_subs_price']}}@endif
 			                		@if(!empty($p['p_price_per_optn']))
@@ -188,6 +202,12 @@
 			                	<!-- <span data-toggle="tooltip" data-placement="top" title=" Item">
 			                		<i class="fa fa-archive"></i>
 			                	</span> -->
+								@php
+									$p['p_selling_price'] = number_format($p['p_selling_price'],$decimal_place[0]['decimal_places']);
+                                    $p['p_selling_price'] = str_replace('.00','',$p['p_selling_price']);
+								$p['p_lend_price'] = number_format($p['p_lend_price'],$decimal_place[0]['decimal_places']);
+                                    $p['p_lend_price'] = str_replace('.00','',$p['p_lend_price']);
+								@endphp
 			                	<span data-toggle="tooltip" class="text-info" data-placement="top" title="Selling Price">
 			                		<i class="fa fa-tag"></i>   {{$p->currency->symbol}}@if($p['p_selling_price']=='0'){{'Free'}}@else{{$p['p_selling_price']}}@endif
 			                	</span>
@@ -213,6 +233,10 @@
 			                	<!-- <span data-toggle="tooltip" data-placement="top" title=" Membership">
 			                		<i class="fa fa-archive"></i>
 			                	</span> -->
+								@php
+									$p['p_selling_price'] = number_format($p['p_selling_price'],$decimal_place[0]['decimal_places']);
+                                    $p['p_selling_price'] = str_replace('.00','',$p['p_selling_price']);
+								@endphp
 		                		<span data-toggle="tooltip" class="text-info" data-placement="top" title="Selling Price">
 				                	<i class="fa fa-tag"></i>{{$p->currency->symbol}}@if($p['p_selling_price']=='0'){{'Free'}}@else{{$p['p_selling_price']}}@endif
 				                </span>

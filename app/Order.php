@@ -22,10 +22,13 @@ class Order extends Model
 		'o_currency',
 		'o_sub_total',
 		'o_total',
+        'o_delivery_charge',
+        'o_delivery_provider',
 		'o_quantity',
 		'o_purchased_for',
 		'o_dispatched',
 		'o_dispatched_date',
+        'o_parcel_id',
 		'o_returned',
 		'o_returned_date',
 		'o_cancelled',
@@ -37,11 +40,27 @@ class Order extends Model
 		'o_lend_subscribe_ends',
 		'o_completed_on',
 		'o_completed',
+        'o_not_delivered',
+        'o_not_delivered_date',
+        'o_delivered',
+        'o_delivered_date',
+        'o_subs_period',
+        'p_price_per_optn',
+        'subs_status',
+        'reminder_time'
     ];
 
     /*
     Relations 
     */
+    public function return_history()
+    {
+        return $this->belongsTo('App\return_history','id','order_id');
+    }
+    public function item_order_notification()
+    {
+        return $this->hasMany('App\item_order_notification','id','order_id');
+    }
     public function currency()
     {
     	return $this->belongsTo('App\currencies','o_currency','code');
@@ -61,5 +80,13 @@ class Order extends Model
     public function product_details()
     {
         return $this->belongsTo('App\Product', 'o_product_id','id');
+    }
+    public function tracking_link()
+    {
+    	return $this->belongsTo('App\deliverie','o_tracking_link','id');
+    }
+    public function deliveryprovider()
+    {
+        return $this->belongsTo('App\deliverie','o_delivery_provider','id');
     }
 }
