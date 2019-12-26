@@ -31,6 +31,7 @@ $friends = App\friend::where('friend_id_1',Auth::user()->id)->where('status','1'
     .gm-style-iw.gm-style-iw-c {
     max-width: 320px;
     max-height: 180px !important;
+    padding-right:25px !important;
     }
     .gm-style-iw-d {
     overflow: hidden !important;
